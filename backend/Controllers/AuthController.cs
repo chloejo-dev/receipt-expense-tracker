@@ -3,6 +3,7 @@ using ExpenseTracker.Api.Data;
 using ExpenseTracker.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 
 [ApiController]
@@ -22,10 +23,45 @@ public class AuthController : ControllerBase
     [HttpPost("sign-up")]
     public async Task<IActionResult> SignUp(SignUpRequest request)
     {
+        // Input validation
+        var name = request.Name;
+        var email = request.Email;
+        var password = request.Password;
+        var confirmPassword = request.ConfirmPassword;
+
+        // Name/email/password/confirmPassword is empty?
+        if (string.IsNullOrWhiteSpace(name) ||
+        string.IsNullOrWhiteSpace(email) ||
+        string.IsNullOrWhiteSpace(password) ||
+        string.IsNullOrWhiteSpace(confirmPassword))
+        {
+            return BadRequest();
+        }
+
+        // Email regex
+        var emailRegex = new Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$");
+
+        if (!emailRegex.IsMatch(email))
+        {
+            return BadRequest();
+        }
+
+        // Password length (15-64)
+        if (password.Length < 15 || password.Length > 64)
+        {
+            return BadRequest();
+        }
+
+        // Passwords match?
+        if (password != confirmPassword)
+        {
+             return BadRequest();
+        }
+
         // Check duplicate email => Result type = bool
         // User exists? 
         // Y: true, N: false
-        var existingUser = await _context.Users.AnyAsync(user => user.Email == request.Email);
+        var existingUser = await _context.Users.AnyAsync(user => user.Email == email);
 
         if (existingUser)
         {
@@ -33,13 +69,13 @@ public class AuthController : ControllerBase
         }
 
         // Hash password
-        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
         // Create user
         var newUser = new User
         {
-            Name = request.Name,
-            Email = request.Email,
+            Name = name,
+            Email = email,
             HashedPassword = hashedPassword
         };
 
