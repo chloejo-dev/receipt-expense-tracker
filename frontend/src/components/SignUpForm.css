@@ -31,3 +31,11 @@
     color: white;
     cursor: pointer;
 }
+
+.error-message {
+    margin-top: 0.25rem;
+    display: flex;
+    gap: 0.25rem;
+    color: red;
+
+}

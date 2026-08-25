@@ -9,6 +9,19 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
 
+// Add CORS services
+var MyAllowSpecificOrigins = "AllowFrontend";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:5173")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -21,6 +34,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add the CORS middleware
+app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
 
