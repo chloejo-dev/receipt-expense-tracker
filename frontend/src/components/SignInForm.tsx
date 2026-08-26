@@ -3,7 +3,7 @@ import "./SignInForm.css";
 export default function SignInForm() {
   return (
     <form className='sign-in-form'>
-      <div>
+      <div className='form-field'>
         <label htmlFor='email'>Email</label>
         <input
           type='email'
@@ -13,7 +13,7 @@ export default function SignInForm() {
           autoComplete='email'
         />
       </div>
-      <div>
+      <div className='form-field'>
         <label htmlFor='password'>Password</label>
         <input
           type='password'
