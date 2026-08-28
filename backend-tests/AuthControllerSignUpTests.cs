@@ -2,24 +2,41 @@ using ExpenseTracker.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Api.Models;
+using Microsoft.Extensions.Configuration;
+using Moq;
+using Microsoft.AspNetCore.Hosting;
 
-public class AuthControllerTests
+public class AuthControllerSignUpTests
 {
+    // Helper method to create AuthController
+    private (AuthController controller, AppDbContext context) CreateTestSetup()
+    {
+        // Set to use EF Core InMemory provider instead of actual SQL server
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+
+        // Prepare dependencies: AppDbContext, IConfiguration, and IWebHostEnvironment
+        var context = new AppDbContext(options);
+
+        var configuration = new ConfigurationBuilder()
+        .AddInMemoryCollection()
+        .Build();
+
+        var environmentMock = new Mock<IWebHostEnvironment>();
+
+        // Create AuthController instance with dependencies
+        var controller = new AuthController(context, configuration, environmentMock.Object);
+
+        return (controller, context);
+    }
     // Validate user input by writing test methods
     // Name empty?
     [Fact]
     public async Task SignUp_ReturnsBadRequest_WhenNameIsEmpty()
     {
+
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
-
+        // Create AuthController instance using helper method
+        var (controller, _) = CreateTestSetup();
 
         // Actual code: 
         // SignUp(SignUpRequest request) --> SignUpRequest DTO (object initializer)
@@ -43,14 +60,7 @@ public class AuthControllerTests
     public async Task SignUp_ReturnsBadRequest_WhenEmailIsEmpty()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, _) = CreateTestSetup();
 
         var request = new SignUpRequest
         {
@@ -72,14 +82,7 @@ public class AuthControllerTests
     public async Task SignUp_ReturnsBadRequest_WhenEmailIsInvalid()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+       var (controller, _) = CreateTestSetup();
 
         var request = new SignUpRequest
         {
@@ -101,14 +104,7 @@ public class AuthControllerTests
     public async Task SignUp_ReturnsBadRequest_WhenPasswordIsEmpty()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, _) = CreateTestSetup();
 
         var request = new SignUpRequest
         {
@@ -130,14 +126,7 @@ public class AuthControllerTests
     public async Task SignUp_ReturnsBadRequest_WhenPasswordIsTooShort()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, _) = CreateTestSetup();
 
         var request = new SignUpRequest
         {
@@ -159,14 +148,7 @@ public class AuthControllerTests
     public async Task SignUp_ReturnsBadRequest_WhenPasswordIsTooLong()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, _) = CreateTestSetup();
 
         var password = new string('a', 65);
 
@@ -190,14 +172,7 @@ public class AuthControllerTests
     public async Task SignUp_ReturnsBadRequest_WhenConfirmPasswordIsEmpty()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, _) = CreateTestSetup();
 
         var password = new string('a', 17);
 
@@ -221,14 +196,7 @@ public class AuthControllerTests
     public async Task SignUp_ReturnsBadRequest_WhenPasswordsAreDifferent()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, _) = CreateTestSetup();
 
         var password = new string('a', 17);
         var confirmPassword = new string('b', 17);
@@ -253,14 +221,7 @@ public class AuthControllerTests
     public async Task SignUp_HashesPassword_WhenRequestIsValid()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, context) = CreateTestSetup();
 
         var password = new string('a', 17);
 
@@ -293,14 +254,7 @@ public class AuthControllerTests
     public async Task SignUp_ReturnsConflict_WhenEmailIsDuplicate()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, context) = CreateTestSetup();
 
         // Create and store user in DB
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(new string('c', 15));
@@ -311,6 +265,8 @@ public class AuthControllerTests
             Email = "test@test.com",
             HashedPassword = hashedPassword
         });
+        
+        // Save changes
         await context.SaveChangesAsync();
 
         // Create new user with the same email address
@@ -337,14 +293,7 @@ public class AuthControllerTests
      public async Task SignUp_ReturnsCreated_WhenRequestIsValid()
     {
         // Arrange
-        // Set to use EF Core InMemory provider instead of actual SQL server
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-
-        // Create AppDbContext instance
-        var context = new AppDbContext(options);
-
-        // Create AuthController instance with context
-        var controller = new AuthController(context);
+        var (controller, _) = CreateTestSetup();
 
         // Create valid sign-up request
         var password = new string('a', 17);
