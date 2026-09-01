@@ -176,7 +176,7 @@ public class AuthController : ControllerBase
         // Convert JWT object into string
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-        // Set cookie 
+        // Set cookie -> Server tells browser to set cookie
         Response.Cookies.Append("auth_token",
             tokenString,
             new CookieOptions
@@ -192,4 +192,15 @@ public class AuthController : ControllerBase
         // Return success response
         return Ok();
     }
+
+    [HttpPost("sign-out")]
+    public IActionResult SignOutUser()
+    {
+        // Server tells browser to delete cookie
+        Response.Cookies.Delete("auth_token", new CookieOptions { Path = "/" });
+
+        // Return success response
+        return Ok();
+    }
 }
+
