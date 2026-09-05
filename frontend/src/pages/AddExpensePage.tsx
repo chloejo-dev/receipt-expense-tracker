@@ -52,7 +52,7 @@ export default function AddExpensePage() {
       </div>
 
       <div className='expense-form-field'>
-        <label htmlFor='total'>Total Amount($)</label>
+        <label htmlFor='total'>Total Amount ($)</label>
         <input type='number' id='total' name='total' required />
       </div>
       <div className='expense-form-field'>
