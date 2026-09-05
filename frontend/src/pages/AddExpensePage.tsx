@@ -23,6 +23,7 @@ export default function AddExpensePage() {
 
   const [store, setStore] = useState("");
   const [category, setCategory] = useState("category");
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
 
   return (
     <form className='expense-form'>
@@ -39,7 +40,7 @@ export default function AddExpensePage() {
       <div className='expense-form-field'>
         <label className='receipt-photo' htmlFor='receipt'>
           <Camera />
-          Take or upload a receipt
+          {receiptFile ? receiptFile.name : "Take or upload a receipt"}
         </label>
         <input
           type='file'
@@ -47,7 +48,14 @@ export default function AddExpensePage() {
           name='receipt'
           required
           accept='image/*'
+          capture='environment'
           className='receipt-input'
+          onChange={(e) => {
+            // Get receipt photo
+            const file = e.target.files?.[0];
+            if (!file) return;
+            setReceiptFile(file);
+          }}
         />
       </div>
 
