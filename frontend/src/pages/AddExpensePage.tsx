@@ -26,6 +26,7 @@ export default function AddExpensePage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
+  const [notification, setNotification] = useState("");
 
   useEffect(() => {
     // Call OCR API endpoint
@@ -35,6 +36,7 @@ export default function AddExpensePage() {
       // Clear previous request results
       setError("");
       setTotalAmount("");
+      setNotification("");
 
       const formData = new FormData();
       formData.append("receipt", receiptFile);
@@ -45,6 +47,7 @@ export default function AddExpensePage() {
           body: formData,
         });
 
+        // Failure responses
         if (!res.ok) {
           // error
           setError("Can't read the image. Please enter the total amount.");
@@ -54,13 +57,18 @@ export default function AddExpensePage() {
         // Get and set total amount
         const data: { totalAmount: string | null } = await res.json();
 
+        // Fail to extract total amount
         if (data.totalAmount === null) {
           setTotalAmount("");
           setError("Can't read the image. Please enter the total amount.");
           return;
         }
 
+        // Correct, incorrect total amount
         setTotalAmount(data.totalAmount);
+        setNotification(
+          "Please review and edit the total amount if needed before saving.",
+        );
       } catch {
         setError("Can't read the image. Please enter the total amount.");
       }
@@ -116,9 +124,11 @@ export default function AddExpensePage() {
           value={totalAmount}
           onChange={(e) => {
             setError("");
+            setNotification("");
             setTotalAmount(e.target.value);
           }}
         />
+        {notification && <span>{notification}</span>}
       </div>
       <div className='expense-form-field'>
         <label htmlFor='store'>Store</label>
