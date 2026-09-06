@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./AddExpensePage.css";
 import { Camera } from "lucide-react";
 
@@ -24,6 +24,50 @@ export default function AddExpensePage() {
   const [store, setStore] = useState("");
   const [category, setCategory] = useState("category");
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [error, setError] = useState("");
+  const [totalAmount, setTotalAmount] = useState("");
+
+  useEffect(() => {
+    // Call OCR API endpoint
+    const extractText = async () => {
+      if (!receiptFile) return;
+
+      // Clear previous request results
+      setError("");
+      setTotalAmount("");
+
+      const formData = new FormData();
+      formData.append("receipt", receiptFile);
+
+      try {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/ocr`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          // error
+          setError("Can't read the image. Please enter the total amount.");
+          return;
+        }
+
+        // Get and set total amount
+        const data: { totalAmount: string | null } = await res.json();
+
+        if (data.totalAmount === null) {
+          setTotalAmount("");
+          setError("Can't read the image. Please enter the total amount.");
+          return;
+        }
+
+        setTotalAmount(data.totalAmount);
+      } catch {
+        setError("Can't read the image. Please enter the total amount.");
+      }
+    };
+
+    extractText();
+  }, [receiptFile]);
 
   return (
     <form className='expense-form'>
@@ -57,11 +101,24 @@ export default function AddExpensePage() {
             setReceiptFile(file);
           }}
         />
+        {error && <span>{error}</span>}
       </div>
 
       <div className='expense-form-field'>
         <label htmlFor='total'>Total Amount ($)</label>
-        <input type='number' id='total' name='total' required />
+        <input
+          type='number'
+          id='total'
+          name='total'
+          required
+          step='0.01'
+          min='0'
+          value={totalAmount}
+          onChange={(e) => {
+            setError("");
+            setTotalAmount(e.target.value);
+          }}
+        />
       </div>
       <div className='expense-form-field'>
         <label htmlFor='store'>Store</label>
