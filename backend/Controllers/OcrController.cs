@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Azure;
 using Azure.AI.Vision.ImageAnalysis;
+using ExpenseTracker.Api.Services;
 
 [ApiController]
 [Route("api/ocr")]
@@ -51,29 +52,9 @@ public class OcrController : ControllerBase
         .ToArray();
 
         // Find the total amount section using index
-        int totalAmountIndex = -1;
+        string? totalAmount = TotalAmountExtractor.ExtractTotalAmount(extractedLines);
 
-        for (int i = 0; i < extractedLines.Length; i++)
-        {
-            if (extractedLines[i].Equals("TOTAL", StringComparison.OrdinalIgnoreCase) && i + 1 < extractedLines.Length)
-            {
-                totalAmountIndex = i + 1;
-                break;
-            }
-        }
-
-        if (totalAmountIndex == -1)
-        {
-            return Ok(new { totalAmount = (string?)null });
-        }
-
-        // Get total amount only
-        string totalAmount = extractedLines[totalAmountIndex];
-
-        // Get rid of $ symbol
-        totalAmount = totalAmount.Replace("$", "");
-
-        // Send response with extracted total amount
+        // Send response with extracted total amount: null or number
         return Ok(new {totalAmount});
     }
 }
