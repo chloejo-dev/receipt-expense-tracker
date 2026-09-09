@@ -2,15 +2,22 @@ import { useEffect, useState } from "react";
 import "./AddExpensePage.css";
 import { Camera } from "lucide-react";
 
-// Store-category mapping for category auto selection
-const storeCategoryMap = {
-  walmart: "groceries",
-  sobeys: "groceries",
-  "best-buy": "electronics",
-};
+interface StoreOption {
+  storeId: number;
+  storeName: string;
+  defaultCategoryId: number;
+  defaultCategoryName: string;
+}
 
-// Custom type
-type Store = keyof typeof storeCategoryMap;
+interface CategoryOption {
+  categoryId: number;
+  categoryName: string;
+}
+
+interface ExpenseOptionsResponse {
+  stores: StoreOption[];
+  categories: CategoryOption[];
+}
 
 export default function AddExpensePage() {
   const today = new Date();
@@ -21,12 +28,45 @@ export default function AddExpensePage() {
 
   const currentDate = `${year}-${month}-${date}`;
 
-  const [store, setStore] = useState("");
-  const [category, setCategory] = useState("category");
+  const [storeList, setStoreList] = useState<StoreOption[]>([]);
+  const [categoryList, setCategoryList] = useState<CategoryOption[]>([]);
+  const [storeId, setStoreId] = useState(0);
+  const [categoryId, setCategoryId] = useState(0);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
-  const [error, setError] = useState("");
+  const [extractionError, setExtractionError] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
   const [notification, setNotification] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const getStoresAndCategories = async () => {
+      try {
+        // Get store and category options
+        const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/expense-options`,
+        );
+
+        if (!res.ok) {
+          // Handle failure responses
+          setError("Something is wrong. Please try again later.");
+          return;
+        }
+
+        const data: ExpenseOptionsResponse = await res.json();
+
+        setStoreList(data.stores);
+        setCategoryList(data.categories);
+      } catch {
+        // Handle errors
+        setError("Something is wrong. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getStoresAndCategories();
+  }, []);
 
   useEffect(() => {
     // Call OCR API endpoint
@@ -34,7 +74,7 @@ export default function AddExpensePage() {
       if (!receiptFile) return;
 
       // Clear previous request results
-      setError("");
+      setExtractionError("");
       setTotalAmount("");
       setNotification("");
 
@@ -49,28 +89,33 @@ export default function AddExpensePage() {
 
         // Failure responses
         if (!res.ok) {
-          // error
-          setError("Can't read the image. Please enter the total amount.");
+          setExtractionError(
+            "Can't read the image. Please enter the total amount.",
+          );
           return;
         }
 
         // Get and set total amount
         const data: { totalAmount: string | null } = await res.json();
 
-        // Fail to extract total amount
+        // If extracting total amount fails
         if (data.totalAmount === null) {
           setTotalAmount("");
-          setError("Can't read the image. Please enter the total amount.");
+          setExtractionError(
+            "Can't read the image. Please enter the total amount.",
+          );
           return;
         }
 
-        // Correct, incorrect total amount
+        // Set the extracted total amount and ask the user to review it
         setTotalAmount(data.totalAmount);
         setNotification(
           "Please review and edit the total amount if needed before saving.",
         );
       } catch {
-        setError("Can't read the image. Please enter the total amount.");
+        setExtractionError(
+          "Can't read the image. Please enter the total amount.",
+        );
       }
     };
 
@@ -109,7 +154,7 @@ export default function AddExpensePage() {
             setReceiptFile(file);
           }}
         />
-        {error && <span>{error}</span>}
+        {extractionError && <span>{extractionError}</span>}
       </div>
 
       <div className='expense-form-field'>
@@ -123,7 +168,7 @@ export default function AddExpensePage() {
           min='0'
           value={totalAmount}
           onChange={(e) => {
-            setError("");
+            setExtractionError("");
             setNotification("");
             setTotalAmount(e.target.value);
           }}
@@ -135,20 +180,42 @@ export default function AddExpensePage() {
         <select
           name='store'
           id='store'
-          defaultValue='store'
           className='expense-form-select'
+          value={storeId}
           onChange={(e) => {
-            const store = e.target.value as Store;
-            setStore(store);
-            setCategory(storeCategoryMap[store]);
+            // Get store id for the selected store
+            const selectedStoreId = Number(e.target.value);
+            setStoreId(selectedStoreId);
+
+            // Find the selected store
+            const storeInfo = storeList.find(
+              (store) => store.storeId === selectedStoreId,
+            );
+
+            // If store info is not found
+            if (!storeInfo) {
+              setCategoryId(0);
+              return;
+            }
+
+            // Allow manual category selection when Other is selected
+            if (storeInfo.storeName === "Other") {
+              setCategoryId(0);
+            } else {
+              // Set default category based on the selected store
+              setCategoryId(storeInfo.defaultCategoryId);
+            }
           }}
+          disabled={isLoading || Boolean(error)}
         >
-          <option value='store' disabled>
+          <option value={0} disabled>
             Select store
           </option>
-          <option value='walmart'>Walmart</option>
-          <option value='sobeys'>Sobeys</option>
-          <option value='best-buy'>Best Buy</option>
+          {storeList.map((store) => (
+            <option value={store.storeId} key={store.storeId}>
+              {store.storeName}
+            </option>
+          ))}
         </select>
       </div>
       <div className='expense-form-field'>
@@ -157,17 +224,23 @@ export default function AddExpensePage() {
           name='category'
           id='category'
           className='expense-form-select'
-          value={category}
+          value={categoryId}
+          disabled={isLoading || Boolean(error)}
           onChange={(e) => {
-            console.log(e.target.value);
-            setCategory(e.target.value);
+            const selectedCategoryId = Number(e.target.value);
+            setCategoryId(selectedCategoryId);
           }}
         >
-          <option value='category'>Category</option>
-          <option value='groceries'>Groceries</option>
-          <option value='electronics'>Electronics</option>
-          <option value='beauty'>Beauty</option>
+          <option value={0} disabled>
+            Select category
+          </option>
+          {categoryList.map((category) => (
+            <option value={category.categoryId} key={category.categoryId}>
+              {category.categoryName}
+            </option>
+          ))}
         </select>
+        {error && <span>{error}</span>}
       </div>
       <button type='submit' className='save-btn'>
         Save
