@@ -14,6 +14,9 @@ public class AppDbContext : DbContext
     public DbSet<Store> Stores { get; set; }
     public DbSet<Category> Categories { get; set; }
 
+    public DbSet<Receipt> Receipts { get; set; }
+    public DbSet<Expense> Expenses { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // No duplicate emails allowed
@@ -117,5 +120,27 @@ public class AppDbContext : DbContext
         new Store { StoreId = 15, StoreName = "Amazon", CategoryId = 8 },
         new Store { StoreId = 16, StoreName = "Other", CategoryId = 8 }
         );
-    }
+
+        modelBuilder.Entity<Receipt>()
+            .Property(receipt => receipt.TotalAmount)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Expense>()
+            .Property(expense => expense.Amount)
+            .HasPrecision(18, 2);
+
+        // Category 삭제 시 연결된 Store 삭제 방지
+        modelBuilder.Entity<Store>()
+        .HasOne(store => store.Category)
+        .WithMany()
+        .HasForeignKey(store => store.CategoryId)
+        .OnDelete(DeleteBehavior.NoAction);
+
+        // Category 삭제 시 연결된 Expense 삭제 방지
+        modelBuilder.Entity<Expense>()
+        .HasOne(expense => expense.Category)
+        .WithMany()
+        .HasForeignKey(expense => expense.CategoryId)
+        .OnDelete(DeleteBehavior.NoAction);
+        }
 }
