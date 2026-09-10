@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
 import "./AddExpensePage.css";
 import { Camera } from "lucide-react";
+import getDefaultCategoryId from "./categorySelection";
 
-interface StoreOption {
-  storeId: number;
-  storeName: string;
-  defaultCategoryId: number;
-  defaultCategoryName: string;
-}
-
-interface CategoryOption {
-  categoryId: number;
-  categoryName: string;
-}
-
-interface ExpenseOptionsResponse {
-  stores: StoreOption[];
-  categories: CategoryOption[];
-}
+// Define types in a separate types file and import it to use
+import type {
+  StoreOption,
+  CategoryOption,
+  ExpenseOptionsResponse,
+} from "./expenseOptions.types";
 
 export default function AddExpensePage() {
   const today = new Date();
@@ -187,24 +178,13 @@ export default function AddExpensePage() {
             const selectedStoreId = Number(e.target.value);
             setStoreId(selectedStoreId);
 
-            // Find the selected store
-            const storeInfo = storeList.find(
-              (store) => store.storeId === selectedStoreId,
+            // Find defaultCategoryId
+            const defaultCategoryId = getDefaultCategoryId(
+              selectedStoreId,
+              storeList,
             );
 
-            // If store info is not found
-            if (!storeInfo) {
-              setCategoryId(0);
-              return;
-            }
-
-            // Allow manual category selection when Other is selected
-            if (storeInfo.storeName === "Other") {
-              setCategoryId(0);
-            } else {
-              // Set default category based on the selected store
-              setCategoryId(storeInfo.defaultCategoryId);
-            }
+            setCategoryId(defaultCategoryId);
           }}
           disabled={isLoading || Boolean(error)}
         >
