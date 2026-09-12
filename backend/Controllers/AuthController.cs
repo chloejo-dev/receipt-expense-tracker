@@ -1,6 +1,7 @@
 
 using ExpenseTracker.Api.Data;
 using ExpenseTracker.Api.Models;
+using ExpenseTracker.Api.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
@@ -8,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+namespace ExpenseTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]

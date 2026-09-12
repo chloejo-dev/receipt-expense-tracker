@@ -3,6 +3,8 @@ using Azure;
 using Azure.AI.Vision.ImageAnalysis;
 using ExpenseTracker.Api.Services;
 
+namespace ExpenseTracker.Api.Controllers;
+
 [ApiController]
 [Route("api/ocr")]
 public class OcrController : ControllerBase
