@@ -10,6 +10,10 @@ import type {
   ExpenseOptionsResponse,
 } from "./expenseOptions.types";
 
+// interface ExpenseInput {
+//   categoryId: number;
+//   amount: number;
+// }
 export default function AddExpensePage() {
   const today = new Date();
 
@@ -18,7 +22,6 @@ export default function AddExpensePage() {
   const year = today.getFullYear().toString();
 
   const currentDate = `${year}-${month}-${date}`;
-
   const [storeList, setStoreList] = useState<StoreOption[]>([]);
   const [categoryList, setCategoryList] = useState<CategoryOption[]>([]);
   const [storeId, setStoreId] = useState(0);
@@ -26,10 +29,14 @@ export default function AddExpensePage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [extractionError, setExtractionError] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
+  // const [expenses, setExpenses] = useState<ExpenseInput[]>([]);
+  const [expenseDate, setExpenseDate] = useState(currentDate);
   const [notification, setNotification] = useState("");
   const [error, setError] = useState("");
+  const [inputError, setInputError] = useState({ type: "", message: "" });
   const [isLoading, setIsLoading] = useState(true);
 
+  // Get expense options from DB
   useEffect(() => {
     const getStoresAndCategories = async () => {
       try {
@@ -59,6 +66,7 @@ export default function AddExpensePage() {
     getStoresAndCategories();
   }, []);
 
+  // Extract total amount from receipt image
   useEffect(() => {
     // Call OCR API endpoint
     const extractText = async () => {
@@ -113,8 +121,87 @@ export default function AddExpensePage() {
     extractText();
   }, [receiptFile]);
 
+  const handleSubmit: React.SubmitEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+
+    // Validate input and let users know about errors if any
+    console.log(expenseDate, storeId, categoryId, totalAmount);
+    if (!expenseDate) {
+      setInputError({ type: "date", message: "Please enter a date." });
+      return;
+    }
+
+    if (!receiptFile) {
+      setInputError({
+        type: "receipt",
+        message: "Please take or upload a receipt.",
+      });
+      return;
+    }
+
+    const parsedTotalAmount = Number(totalAmount);
+
+    if (
+      !totalAmount ||
+      !Number.isFinite(parsedTotalAmount) ||
+      parsedTotalAmount < 0.01 ||
+      parsedTotalAmount > 999999.99
+    ) {
+      setInputError({
+        type: "total amount",
+        message: "Please enter a valid total amount.",
+      });
+      return;
+    }
+
+    if (!storeId) {
+      setInputError({
+        type: "store",
+        message: "Please select a store.",
+      });
+      return;
+    }
+
+    if (!categoryId) {
+      setInputError({
+        type: "category",
+        message: "Please select a category.",
+      });
+      return;
+    }
+
+    setError("");
+    
+    // POST api/receipts
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/receipts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          Date: expenseDate,
+          TotalAmount: parsedTotalAmount,
+          StoreId: storeId,
+          Expenses: [{ Amount: parsedTotalAmount, CategoryId: categoryId }],
+        }),
+      });
+
+      // Handle error responses
+      if (!res.ok) {
+        setError("Failed to save a record. Please try again.");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Data successfully stored!", data);
+
+      // Handle errors
+    } catch {
+      setError("Oops, failed to save a record. Please try again.");
+    }
+  };
   return (
-    <form className='expense-form'>
+    <form className='expense-form' onSubmit={handleSubmit} noValidate>
       <div className='expense-form-field'>
         <label htmlFor='date'>Date</label>
         <input
@@ -122,8 +209,15 @@ export default function AddExpensePage() {
           id='date'
           name='date'
           required
-          defaultValue={currentDate}
+          value={expenseDate}
+          onChange={(e) => {
+            if (inputError.type === "date") {
+              setInputError({ type: "", message: "" });
+            }
+            setExpenseDate(e.target.value);
+          }}
         />
+        {inputError.type === "date" && <span>{inputError.message}</span>}
       </div>
       <div className='expense-form-field'>
         <label className='receipt-photo' htmlFor='receipt'>
@@ -139,6 +233,9 @@ export default function AddExpensePage() {
           capture='environment'
           className='receipt-input'
           onChange={(e) => {
+            if (inputError.type === "receipt") {
+              setInputError({ type: "", message: "" });
+            }
             // Get receipt photo
             const file = e.target.files?.[0];
             if (!file) return;
@@ -146,8 +243,8 @@ export default function AddExpensePage() {
           }}
         />
         {extractionError && <span>{extractionError}</span>}
+        {inputError.type === "receipt" && <span>{inputError.message}</span>}
       </div>
-
       <div className='expense-form-field'>
         <label htmlFor='total'>Total Amount ($)</label>
         <input
@@ -156,15 +253,22 @@ export default function AddExpensePage() {
           name='total'
           required
           step='0.01'
-          min='0'
+          min='0.01'
+          max='999999.99'
           value={totalAmount}
           onChange={(e) => {
+            if (inputError.type === "total amount") {
+              setInputError({ type: "", message: "" });
+            }
             setExtractionError("");
             setNotification("");
             setTotalAmount(e.target.value);
           }}
         />
         {notification && <span>{notification}</span>}
+        {inputError.type === "total amount" && (
+          <span>{inputError.message}</span>
+        )}
       </div>
       <div className='expense-form-field'>
         <label htmlFor='store'>Store</label>
@@ -174,6 +278,9 @@ export default function AddExpensePage() {
           className='expense-form-select'
           value={storeId}
           onChange={(e) => {
+            if (inputError.type === "store" || inputError.type === "category") {
+              setInputError({ type: "", message: "" });
+            }
             // Get store id for the selected store
             const selectedStoreId = Number(e.target.value);
             setStoreId(selectedStoreId);
@@ -186,7 +293,7 @@ export default function AddExpensePage() {
 
             setCategoryId(defaultCategoryId);
           }}
-          disabled={isLoading || Boolean(error)}
+          disabled={isLoading || storeList.length === 0}
         >
           <option value={0} disabled>
             Select store
@@ -197,6 +304,7 @@ export default function AddExpensePage() {
             </option>
           ))}
         </select>
+        {inputError.type === "store" && <span>{inputError.message}</span>}
       </div>
       <div className='expense-form-field'>
         <label htmlFor='category'>Category</label>
@@ -205,8 +313,11 @@ export default function AddExpensePage() {
           id='category'
           className='expense-form-select'
           value={categoryId}
-          disabled={isLoading || Boolean(error)}
+          disabled={isLoading || categoryList.length === 0}
           onChange={(e) => {
+            if (inputError.type === "category") {
+              setInputError({ type: "", message: "" });
+            }
             const selectedCategoryId = Number(e.target.value);
             setCategoryId(selectedCategoryId);
           }}
@@ -220,8 +331,9 @@ export default function AddExpensePage() {
             </option>
           ))}
         </select>
-        {error && <span>{error}</span>}
+        {inputError.type === "category" && <span>{inputError.message}</span>}
       </div>
+      {error && <span>{error}</span>}
       <button type='submit' className='save-btn'>
         Save
       </button>

@@ -1,8 +1,8 @@
-
 using ExpenseTracker.Api.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+namespace ExpenseTracker.Api.Controllers;
 [ApiController]
 [Route("api/expense-options")]
 public class ExpenseOptionsController : ControllerBase
