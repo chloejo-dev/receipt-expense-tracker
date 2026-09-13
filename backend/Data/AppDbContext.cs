@@ -125,6 +125,18 @@ public class AppDbContext : DbContext
             .Property(receipt => receipt.TotalAmount)
             .HasPrecision(18, 2);
 
+        modelBuilder.Entity<Receipt>()
+            .Property(receipt => receipt.IdempotencyKey)
+            .HasMaxLength(64);
+
+        modelBuilder.Entity<Receipt>()
+           .HasIndex(receipt => new
+           {
+               receipt.UserId,
+               receipt.IdempotencyKey
+           })
+           .IsUnique();
+
         modelBuilder.Entity<Expense>()
             .Property(expense => expense.Amount)
             .HasPrecision(18, 2);

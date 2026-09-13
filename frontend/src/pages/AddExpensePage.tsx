@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./AddExpensePage.css";
 import { Camera } from "lucide-react";
 import getDefaultCategoryId from "./categorySelection";
@@ -35,6 +35,7 @@ export default function AddExpensePage() {
   const [error, setError] = useState("");
   const [inputError, setInputError] = useState({ type: "", message: "" });
   const [isLoading, setIsLoading] = useState(true);
+  const idempotencyKeyRef = useRef<string | null>(null);
 
   // Get expense options from DB
   useEffect(() => {
@@ -125,7 +126,6 @@ export default function AddExpensePage() {
     e.preventDefault();
 
     // Validate input and let users know about errors if any
-    console.log(expenseDate, storeId, categoryId, totalAmount);
     if (!expenseDate) {
       setInputError({ type: "date", message: "Please enter a date." });
       return;
@@ -171,12 +171,19 @@ export default function AddExpensePage() {
     }
 
     setError("");
-    
+
+    // Create an idempotencyKey to prevent duplicate receipt entries
+    const key = idempotencyKeyRef.current ?? crypto.randomUUID();
+    idempotencyKeyRef.current = key;
+
     // POST api/receipts
     try {
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/receipts`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": key,
+        },
         credentials: "include",
         body: JSON.stringify({
           Date: expenseDate,
@@ -193,6 +200,8 @@ export default function AddExpensePage() {
       }
 
       const data = await res.json();
+
+      idempotencyKeyRef.current = null;
       console.log("Data successfully stored!", data);
 
       // Handle errors
@@ -200,6 +209,12 @@ export default function AddExpensePage() {
       setError("Oops, failed to save a record. Please try again.");
     }
   };
+
+  // Reset idempotency key if any of the inputs changes
+  const resetIdempotencyKey = () => {
+    idempotencyKeyRef.current = null;
+  };
+
   return (
     <form className='expense-form' onSubmit={handleSubmit} noValidate>
       <div className='expense-form-field'>
@@ -211,6 +226,8 @@ export default function AddExpensePage() {
           required
           value={expenseDate}
           onChange={(e) => {
+            resetIdempotencyKey();
+
             if (inputError.type === "date") {
               setInputError({ type: "", message: "" });
             }
@@ -233,6 +250,8 @@ export default function AddExpensePage() {
           capture='environment'
           className='receipt-input'
           onChange={(e) => {
+            resetIdempotencyKey();
+
             if (inputError.type === "receipt") {
               setInputError({ type: "", message: "" });
             }
@@ -257,6 +276,8 @@ export default function AddExpensePage() {
           max='999999.99'
           value={totalAmount}
           onChange={(e) => {
+            resetIdempotencyKey();
+
             if (inputError.type === "total amount") {
               setInputError({ type: "", message: "" });
             }
@@ -278,6 +299,8 @@ export default function AddExpensePage() {
           className='expense-form-select'
           value={storeId}
           onChange={(e) => {
+            resetIdempotencyKey();
+
             if (inputError.type === "store" || inputError.type === "category") {
               setInputError({ type: "", message: "" });
             }
@@ -315,6 +338,8 @@ export default function AddExpensePage() {
           value={categoryId}
           disabled={isLoading || categoryList.length === 0}
           onChange={(e) => {
+            resetIdempotencyKey();
+
             if (inputError.type === "category") {
               setInputError({ type: "", message: "" });
             }

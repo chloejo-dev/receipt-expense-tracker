@@ -21,13 +21,36 @@ public class ReceiptsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateReceipt(ReceiptRequest request)
-    {
+    public async Task<IActionResult> CreateReceipt(ReceiptRequest request, 
+    [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
+    {   
+        // Check if idempotencyKey = null
+        if (string.IsNullOrWhiteSpace(idempotencyKey))
+        {
+            return BadRequest("Idempotency-Key header is required.");
+        }
+
         // Get and validate UserId from JWT Claim
         string? userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-       if (!int.TryParse(userIdClaim, out int userId))
+
+        if (!int.TryParse(userIdClaim, out int userId))
         {
             return Unauthorized();
+        }
+        
+        // Check if idempotency key with UserId already exists
+        Receipt? existingReceipt = await _context.Receipts
+        .AsNoTracking()
+        .FirstOrDefaultAsync(
+            receipt => receipt.UserId == userId &&
+            receipt.IdempotencyKey == idempotencyKey);
+
+        if (existingReceipt is not null)
+        {
+            return StatusCode(
+            StatusCodes.Status201Created,
+            new { receiptId = existingReceipt.ReceiptId }
+            );
         }
 
         // Validate business rules
@@ -71,6 +94,7 @@ public class ReceiptsController : ControllerBase
             UserId = userId,
             Date = request.Date!.Value,
             TotalAmount = request.TotalAmount,
+            IdempotencyKey = idempotencyKey,
             StoreId = request.StoreId,
             Expenses = request.Expenses
             .Select(expense => new Expense
