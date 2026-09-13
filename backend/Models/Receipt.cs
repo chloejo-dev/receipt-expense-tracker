@@ -6,6 +6,7 @@ public class Receipt
     public decimal TotalAmount { get; set; }
     public DateOnly Date { get; set; }
 
+    public required string IdempotencyKey { get; set; }
 
     // FK
     public int UserId { get; set; }
