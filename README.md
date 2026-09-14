@@ -23,7 +23,7 @@ Receipt Expense Tracker addresses this everyday problem by using optical charact
 - Database: Microsoft SQL Server
 - ORM: Entity Framework Core
 - OCR: Azure AI Vision
-- Testing: xUnit
+- Testing: xUnit, Vitest
 
 ---
 
@@ -34,20 +34,23 @@ Receipt Expense Tracker addresses this everyday problem by using optical charact
 - Form validation and duplicate email handling
 - Receipt image upload and mobile camera capture
 - Receipt total extraction using Azure AI Vision OCR
+- Automatic category selection based on the selected store, with manual override
+- Receipt and expense saving through a JWT-protected REST API
+- Server-side validation of stores, categories, and expense totals
 
 ---
 
 ## 🔬 Testing
 
-- Wrote 19 xUnit tests for authentication logic
-- Covered input validation, password hashing, duplicate emails, invalid credentials, and successful sign-up and sign-in flows
+- Wrote 26 unit tests for authentication, text extraction, and automatic default category selection
+- Covered input validation, password hashing, successful/failed sign-in and sign-up scenarios, receipt-total extraction, and automatic category selection
 
 ---
 
 ## 🚧 Features in Progress
 
-- Automatic category selection based on the selected store
-- Expense review, editing, and saving
+- Expense list and detail views
+- Updating and deleting saved expense records
 
 ---
 
