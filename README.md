@@ -1,4 +1,4 @@
-# Receipt Expense Tracker (In Progress)
+# Receipt Expense Tracker
 
 A mobile-first, full-stack expense tracking application built with React, TypeScript, C#, ASP.NET Core, and Microsoft SQL Server.
 
