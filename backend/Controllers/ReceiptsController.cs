@@ -21,9 +21,9 @@ public class ReceiptsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateReceipt(ReceiptRequest request, 
+    public async Task<IActionResult> CreateReceipt(ReceiptRequest request,
     [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
-    {   
+    {
         // Check if idempotencyKey = null
         if (string.IsNullOrWhiteSpace(idempotencyKey))
         {
@@ -37,7 +37,7 @@ public class ReceiptsController : ControllerBase
         {
             return Unauthorized();
         }
-        
+
         // Check if idempotency key with UserId already exists
         Receipt? existingReceipt = await _context.Receipts
         .AsNoTracking()
@@ -62,18 +62,24 @@ public class ReceiptsController : ControllerBase
             return BadRequest("The selected store does not exist.");
         }
 
-        // Create a list to store all category Ids in the Expenses list
-        List<int> requestedCategoryIds = request.Expenses
+        // Get unique category IDs from the request
+        List<int> uniqueCategoryIds = request.Expenses
         .Select(expense => expense.CategoryId) // Select only CategoryId from each row
         .Distinct() // Get rid of duplicate CategoryIds
         .ToList(); // Create a new list of CategoryIds
 
-        // Count CategoryIds in the categories table
-        int existingCategoryCount = await _context.Categories
-        .CountAsync(category => requestedCategoryIds.Contains(category.CategoryId));
+        // Make sure no duplicate categories are in the request
+        if (uniqueCategoryIds.Count < request.Expenses.Count)
+        {
+            return BadRequest("Duplicate categories are not allowed.");
+        }
 
-        // Number of the count == requestedCategoryIds?
-        if (existingCategoryCount != requestedCategoryIds.Count)
+        // Check if all requested categories are in the Categories table
+        int existingCategoryCount = await _context.Categories
+        .CountAsync(category => uniqueCategoryIds.Contains(category.CategoryId));
+
+        // Make sure all requested categories exist
+        if (existingCategoryCount != uniqueCategoryIds.Count)
         {
             return BadRequest("One or more categories do not exist.");
         }
@@ -105,7 +111,6 @@ public class ReceiptsController : ControllerBase
             .ToList()
         };
 
-        
         // Add the Receipt entity and its related expenses to DbContext
         _context.Receipts.Add(receipt);
 
@@ -115,5 +120,41 @@ public class ReceiptsController : ControllerBase
         // Return HTTP 201 Created with receiptId
         return StatusCode(StatusCodes.Status201Created,
         new { receiptId = receipt.ReceiptId });
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<List<ReceiptListItemResponse>>> GetReceipts()
+    {
+        // Get UserId from JWT Claim
+        string? userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized();
+        }
+
+        // Retrieve user's receipt records
+        List<ReceiptListItemResponse> receipts = await _context.Receipts
+        .AsNoTracking()
+        .Where(receipt => receipt.UserId == userId)
+        .OrderByDescending(receipt => receipt.Date) // Latest -> oldest
+        .ThenByDescending(receipt => receipt.CreatedAt) // Latest -> oldest
+        .Select(receipt => new ReceiptListItemResponse
+        {
+            // Map the records to response DTOs
+            ReceiptId = receipt.ReceiptId,
+            Date = receipt.Date,
+            // Display one category name or "Multiple Categories"
+            CategoryLabel = receipt.Expenses.Count > 1
+                ? "Multiple Categories"
+                : receipt.Expenses
+                    .Select(expense => expense.Category.CategoryName)
+                    .First(),
+            TotalAmount = receipt.TotalAmount,
+            StoreName = receipt.Store.StoreName
+        }
+        ).ToListAsync(); 
+
+        // Return response
+        return Ok(receipts);
     }
 }
