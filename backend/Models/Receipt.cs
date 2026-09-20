@@ -8,6 +8,8 @@ public class Receipt
 
     public required string IdempotencyKey { get; set; }
 
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
     // FK
     public int UserId { get; set; }
     public int StoreId { get; set; }
@@ -17,5 +19,4 @@ public class Receipt
     public Store Store { get; set; } = null!;
 
     public ICollection<Expense> Expenses { get; set; } = [];
-
 }
