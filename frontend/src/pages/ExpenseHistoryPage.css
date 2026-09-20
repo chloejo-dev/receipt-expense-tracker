@@ -1,0 +1,113 @@
+.expense-history {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #F9FAFB;
+
+}
+
+.expense-header {
+    display: flex;
+    padding: 1.5rem 1.25rem 1rem 1.25rem;
+    align-items: center;
+    align-self: stretch;
+    border-bottom: 1px solid #D1D5DB;
+    background: #FFF;
+}
+
+.expense-header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 2;
+    color: #111827;
+    font-weight: 700;
+
+}
+
+.history-content {
+    display: flex;
+    padding: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+
+.expense-date-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    align-self: stretch;
+
+}
+
+.expense-card {
+    display: flex;
+    padding: 0.65rem;
+    align-items: center;
+    gap: 0.75rem;
+    align-self: stretch;
+    border-radius: 0.75rem;
+    border: 1px solid #E5E7EB;
+    background: #F9FAFB;
+}
+
+.expense-date {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #111827;
+    font-weight: 500;
+}
+
+.expense-icon {
+    display: flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #EF4444;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 1.25rem;
+    background: #FEE2E2;
+
+}
+
+.expense-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.history-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    flex: 1 0 0;
+}
+
+.history-details h3,
+.history-details p {
+    margin: 0;
+}
+
+
+.history-details h3 {
+    color: #111827;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+}
+
+.history-details p {
+    color: #6B7280;
+    font-size: 0.75rem;
+    font-weight: 400;
+
+}
+
+.expense-amount {
+    font-weight: 600;
+}
