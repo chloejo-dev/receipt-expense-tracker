@@ -12,7 +12,7 @@ namespace ExpenseTracker.Api.Controllers;
 [Authorize]
 [Route("api/receipts")]
 public class ReceiptsController : ControllerBase
-{   
+{
     // Constructor for dependency injection
     private readonly AppDbContext _context;
     public ReceiptsController(AppDbContext context)
@@ -152,9 +152,50 @@ public class ReceiptsController : ControllerBase
             TotalAmount = receipt.TotalAmount,
             StoreName = receipt.Store.StoreName
         }
-        ).ToListAsync(); 
+        ).ToListAsync();
 
         // Return response
         return Ok(receipts);
+    }
+
+    [HttpGet("{receiptId:int}")]
+    public async Task<ActionResult<ReceiptRecordResponse>> GetOneReceipt(int receiptId)
+    {
+        // Get UserId from JWT Claim
+        string? userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized();
+        }
+
+        // Retrieve user's receipt from the Receipts table
+        ReceiptRecordResponse? receipt = await _context.Receipts
+        .AsNoTracking()
+        .Where(receipt => receipt.UserId == userId)
+        .Where(receipt => receipt.ReceiptId == receiptId)
+        .Select(receipt => new ReceiptRecordResponse
+        {
+            // Map the details to response DTOs
+            StoreName = receipt.Store.StoreName,
+            TotalAmount = receipt.TotalAmount,
+            Date = receipt.Date,
+            // Get expenses from the Expenses table
+            Expenses = receipt.Expenses
+            .Select(expense => new ExpenseResponse
+            {
+                Amount = expense.Amount,
+                CategoryName = expense.Category.CategoryName
+            })
+            .ToList()
+        })
+        .FirstOrDefaultAsync();
+
+        if (receipt is null)
+        {
+            return NotFound();
+        }
+
+        // Return response
+        return Ok(receipt);
     }
 }
