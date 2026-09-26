@@ -4,7 +4,6 @@ import "./SignInPage.css";
 export default function SignInPage() {
   return (
     <div className='sign-in-page'>
-      <header className="title">Expense Tracker</header>
       <main className='sign-in-main'>
         <h1 className='main-text'>Track your spending effortlessly.</h1>
         <SignInForm />
