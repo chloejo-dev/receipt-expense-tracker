@@ -1,4 +1,4 @@
-.expense-history {
+.history-page {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -6,7 +6,7 @@
 
 }
 
-.expense-header {
+.history-header {
     display: flex;
     padding: 1.5rem 1.25rem 1rem 1.25rem;
     align-items: center;
@@ -15,7 +15,7 @@
     background: #FFF;
 }
 
-.expense-header h1 {
+.history-header h1 {
     margin: 0;
     font-size: 1.25rem;
     line-height: 2;
@@ -26,15 +26,14 @@
 
 .history-content {
     display: flex;
-    padding: 1.25rem;
     flex-direction: column;
-    align-items: flex-start;
+    padding: 1.25rem;
     gap: 1.5rem;
     flex: 1 0 0;
     align-self: stretch;
 }
 
-.expense-date-group {
+.receipt-group {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -43,7 +42,14 @@
 
 }
 
-.expense-card {
+.receipt-date {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #111827;
+    font-weight: 500;
+}
+
+.receipt-card {
     display: flex;
     padding: 0.65rem;
     align-items: center;
@@ -54,14 +60,18 @@
     background: #F9FAFB;
 }
 
-.expense-date {
+.receipt-card h3,
+p {
     margin: 0;
-    font-size: 0.875rem;
+}
+
+.receipt-card h3 {
     color: #111827;
+    font-size: 0.875rem;
     font-weight: 500;
 }
 
-.expense-icon {
+.category-icon {
     display: flex;
     width: 2.5rem;
     height: 2.5rem;
@@ -75,39 +85,11 @@
 
 }
 
-.expense-icon svg {
+.category-icon svg {
     width: 1.25rem;
     height: 1.25rem;
 }
 
-.history-details {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    flex: 1 0 0;
-}
-
-.history-details h3,
-.history-details p {
-    margin: 0;
-}
-
-
-.history-details h3 {
-    color: #111827;
-    font-size: 0.875rem;
-    font-weight: 500;
-
-}
-
-.history-details p {
-    color: #6B7280;
-    font-size: 0.75rem;
-    font-weight: 400;
-
-}
-
-.expense-amount {
+.receipt-total-amount {
     font-weight: 600;
 }
