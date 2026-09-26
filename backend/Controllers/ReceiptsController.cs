@@ -184,7 +184,8 @@ public class ReceiptsController : ControllerBase
             .Select(expense => new ExpenseResponse
             {
                 Amount = expense.Amount,
-                CategoryName = expense.Category.CategoryName
+                CategoryName = expense.Category.CategoryName,
+                ExpenseId = expense.ExpenseId
             })
             .ToList()
         })

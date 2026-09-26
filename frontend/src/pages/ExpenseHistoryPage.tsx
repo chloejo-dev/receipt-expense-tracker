@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import "./ExpenseHistoryPage.css";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 type Receipt = {
   receiptId: number;
@@ -101,10 +101,7 @@ export default function ExpenseHistoryPage() {
 
   return (
     <div className='history-page'>
-      <header className='history-header'>
-        <h1>Expense History</h1>
-      </header>
-      <main className='history-content'>
+      <div className='history-content'>
         {isLoading ? (
           <p>Loading receipts...</p>
         ) : error ? (
@@ -116,17 +113,21 @@ export default function ExpenseHistoryPage() {
             <section className='receipt-group' key={date}>
               <h2 className='receipt-date'>{date}</h2>
               {dailyReceipts?.map((receipt) => (
-                <article key={receipt.receiptId} className='receipt-card'>
-                  <Coffee />
-                  <h3>{receipt.storeName}</h3>
-                  <p className='receipt-total-amount'>${receipt.totalAmount}</p>
-                  <p>{receipt.categoryLabel}</p>
-                </article>
+                <Link to={`/receipts/${receipt.receiptId}`}>
+                  <article key={receipt.receiptId} className='receipt-card'>
+                    <Coffee />
+                    <h3>{receipt.storeName}</h3>
+                    <p className='receipt-total-amount'>
+                      ${receipt.totalAmount}
+                    </p>
+                    <p>{receipt.categoryLabel}</p>
+                  </article>
+                </Link>
               ))}
             </section>
           ))
         )}
-      </main>
+      </div>
     </div>
   );
 }
