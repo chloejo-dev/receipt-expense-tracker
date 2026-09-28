@@ -21,7 +21,7 @@ type Receipt = {
 
 const CategoryLabels = {
   Dining: {
-    icon: <Coffee />,
+    icon: <Utensils />,
     color: "#EF4444",
     backgroundColor: "#FEE2E2",
   },
@@ -113,8 +113,11 @@ export default function ExpenseHistoryPage() {
             <section className='receipt-group' key={date}>
               <h2 className='receipt-date'>{date}</h2>
               {dailyReceipts?.map((receipt) => (
-                <Link to={`/receipts/${receipt.receiptId}`}>
-                  <article key={receipt.receiptId} className='receipt-card'>
+                <Link
+                  to={`/receipts/${receipt.receiptId}`}
+                  key={receipt.receiptId}
+                >
+                  <article className='receipt-card'>
                     <Coffee />
                     <h3>{receipt.storeName}</h3>
                     <p className='receipt-total-amount'>
