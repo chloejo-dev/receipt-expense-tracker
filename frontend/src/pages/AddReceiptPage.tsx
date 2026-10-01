@@ -29,7 +29,6 @@ export default function AddReceiptPage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [extractionError, setExtractionError] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
-  // const [expenses, setExpenses] = useState<ExpenseInput[]>([]);
   const [expenseDate, setExpenseDate] = useState(currentDate);
   const [notification, setNotification] = useState("");
   const [error, setError] = useState("");
@@ -189,7 +188,7 @@ export default function AddReceiptPage() {
           Date: expenseDate,
           TotalAmount: parsedTotalAmount,
           StoreId: storeId,
-          Expenses: [{ Amount: parsedTotalAmount, CategoryId: categoryId }],
+          CategoryId: categoryId,
         }),
       });
 

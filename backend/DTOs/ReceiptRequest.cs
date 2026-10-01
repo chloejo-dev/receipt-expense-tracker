@@ -13,8 +13,7 @@ public class ReceiptRequest
     [Range(1, int.MaxValue)]
     public int StoreId { get; set; }
 
-    [Required]
-    [MinLength(1)]
-    public List<ExpenseRequest> Expenses { get; set; } = [];
+    [Range(1, int.MaxValue)]
+    public int CategoryId { get; set; }
 
 }

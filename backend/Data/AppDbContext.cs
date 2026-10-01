@@ -15,7 +15,6 @@ public class AppDbContext : DbContext
     public DbSet<Category> Categories { get; set; }
 
     public DbSet<Receipt> Receipts { get; set; }
-    public DbSet<Expense> Expenses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -137,22 +136,17 @@ public class AppDbContext : DbContext
            })
            .IsUnique();
 
-        modelBuilder.Entity<Expense>()
-            .Property(expense => expense.Amount)
-            .HasPrecision(18, 2);
-
-        // Category 삭제 시 연결된 Store 삭제 방지
         modelBuilder.Entity<Store>()
         .HasOne(store => store.Category)
         .WithMany()
         .HasForeignKey(store => store.CategoryId)
         .OnDelete(DeleteBehavior.NoAction);
 
-        // Category 삭제 시 연결된 Expense 삭제 방지
-        modelBuilder.Entity<Expense>()
-        .HasOne(expense => expense.Category)
+        modelBuilder.Entity<Receipt>()
+        .HasOne(receipt => receipt.Category)
         .WithMany()
-        .HasForeignKey(expense => expense.CategoryId)
+        .HasForeignKey(receipt => receipt.CategoryId)
         .OnDelete(DeleteBehavior.NoAction);
-        }
+
+    }
 }
