@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 
 // Define types in a separate types file and import it to use
 import type {
@@ -38,7 +38,6 @@ export default function EditExpensePage() {
         }
 
         const data: ExpenseOptionsResponse = await res.json();
-
         setStoreList(data.stores);
         setCategoryList(data.categories);
       } catch {
@@ -84,12 +83,11 @@ export default function EditExpensePage() {
         }
 
         const data = await res.json();
-        console.log(data);
         // Set and render the retrieved data
         setDate(data.date);
         setTotalAmount(String(data.totalAmount));
         setStoreId(data.storeId);
-        // setCategoryId(data.expenses);
+        setCategoryId(data.categoryId);
         setIsLoading(false);
       } catch {
         setError("Failed to retrieve expense details. Please try again later.");
@@ -136,7 +134,6 @@ export default function EditExpensePage() {
       return;
     }
 
-    // To-do: Replace this with categoryId
     if (!categoryId) {
       setInputError({
         type: "category",
@@ -149,11 +146,11 @@ export default function EditExpensePage() {
 
     try {
       // Call API
-      // PATCH request
+      // PUT request
       const res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/api/expenses/${expenseId}`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -162,7 +159,7 @@ export default function EditExpensePage() {
             Date: date,
             totalAmount: parsedTotalAmount,
             StoreId: storeId,
-            Expenses: categoryId,
+            CategoryId: categoryId,
           }),
         },
       );
@@ -171,8 +168,7 @@ export default function EditExpensePage() {
         setError("Failed to edit the record. Please try again.");
         return;
       }
-
-      console.log("Edit success!");
+      navigate(`/expenses/${expenseId}`);
     } catch {
       setError("Oops, failed to edit the record. Please try again.");
     }
@@ -231,46 +227,29 @@ export default function EditExpensePage() {
         </select>
       </div>
       <div className='expense-form-field'>
-        {categoryId.map((expense) => (
-          <div key={expense.expenseId}>
-            <label htmlFor={`category-${expense.expenseId}`}>Category</label>
-            <select
-              name='category'
-              id={`category-${expense.expenseId}`}
-              value={expense.categoryId}
-              onChange={(e) => {
-                const selectedCategory = categoryList.find(
-                  (category) => category.categoryId === Number(e.target.value),
-                );
-
-                if (!selectedCategory) return;
-                console.log(selectedCategory);
-                setExpenses((current) =>
-                  current.map((item) =>
-                    item.expenseId === expense.expenseId
-                      ? {
-                          ...item,
-                          amount: Number(totalAmount),
-                          categoryId: selectedCategory.categoryId,
-                          categoryName: selectedCategory.categoryName,
-                        }
-                      : item,
-                  ),
-                );
-              }}
-            >
-              {categoryList.map((category) => (
-                <option value={category.categoryId} key={category.categoryId}>
-                  {category.categoryName}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
+        <label htmlFor='category'>Category</label>
+        <select
+          name='category'
+          id='category'
+          className='expense-form-select'
+          value={categoryId}
+          onChange={(e) => {
+            setCategoryId(Number(e.target.value));
+          }}
+        >
+          <option value={0} disabled>
+            Select Category
+          </option>
+          {categoryList.map((category) => (
+            <option value={category.categoryId} key={category.categoryId}>
+              {category.categoryName}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <button type='submit'>Save</button>
-        <button type='button'>Discard</button>
+        <Link to='/expenses'>Discard</Link>
       </div>
     </form>
   );

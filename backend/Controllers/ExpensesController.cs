@@ -62,6 +62,13 @@ public class ExpensesController : ControllerBase
             return BadRequest("The selected store does not exist.");
         }
 
+        // Category exists?
+        bool categoryExists = await _context.Categories.AnyAsync(category => category.CategoryId == request.CategoryId);
+
+        if (!categoryExists)
+        {
+            return BadRequest("The selected category does not exist.");
+        }
 
         // Map DTO objects to DB entities
         Expense expense = new()
@@ -74,7 +81,7 @@ public class ExpensesController : ControllerBase
             CategoryId = request.CategoryId
         };
 
-        // Add the Expense entity
+        // Add a new expense record
         _context.Expenses.Add(expense);
 
         // Save changes
@@ -126,7 +133,7 @@ public class ExpensesController : ControllerBase
             return Unauthorized();
         }
 
-        // Retrieve user's expense from the Expenses table
+        // Retrieve one expense record from the Expenses table
         ExpenseRecordResponse? expense = await _context.Expenses
         .AsNoTracking()
         .Where(expense => expense.UserId == userId)
@@ -134,10 +141,11 @@ public class ExpensesController : ControllerBase
         .Select(expense => new ExpenseRecordResponse
         {
             // Map the details to response DTOs
+            Date = expense.Date,
             StoreId = expense.Store.StoreId,
             StoreName = expense.Store.StoreName,
             TotalAmount = expense.TotalAmount,
-            Date = expense.Date,
+            CategoryId = expense.Category.CategoryId,
             CategoryName = expense.Category.CategoryName
         })
         .FirstOrDefaultAsync();
@@ -163,17 +171,33 @@ public class ExpensesController : ControllerBase
             return Unauthorized();
         }
 
-        // Find an expense with the expenseId
+        // Find an expense record with the userId and expenseId
         var existingExpense = await _context.Expenses
-        .AsNoTracking()
         .FirstOrDefaultAsync(
             expense => expense.UserId == userId &&
             expense.ExpenseId == expenseId);
 
-        // No expense found
+        // No expense record found
         if (existingExpense is null)
         {
             return NotFound();
+        }
+
+        // Validate business rules
+        // Store exists?
+        bool storeExists = await _context.Stores.AnyAsync(store => store.StoreId == request.StoreId);
+
+        if (!storeExists)
+        {
+            return BadRequest("The selected store does not exist.");
+        }
+
+        // Category exists?
+        bool categoryExists = await _context.Categories.AnyAsync(category => category.CategoryId == request.CategoryId);
+
+        if (!categoryExists)
+        {
+            return BadRequest("The selected category does not exist.");
         }
 
         // Update the expense with the data received from the client

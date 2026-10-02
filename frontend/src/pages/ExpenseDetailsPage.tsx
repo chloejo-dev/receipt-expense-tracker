@@ -80,7 +80,6 @@ export default function ExpenseDetailsPage() {
         }
 
         const data = await res.json();
-        console.log(data);
         setExpense(data);
         setIsLoading(false);
       } catch {
