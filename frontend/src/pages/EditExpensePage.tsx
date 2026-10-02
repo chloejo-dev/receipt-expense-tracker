@@ -164,11 +164,27 @@ export default function EditExpensePage() {
         },
       );
 
+      if (res.status === 400) {
+        const message = await res.text();
+        setError(message);
+        return;
+      }
+
+      if (res.status === 401) {
+        navigate("/", { replace: true });
+        return;
+      }
+
+      if (res.status === 404) {
+        setError("No record found.");
+        return;
+      }
+
       if (!res.ok) {
         setError("Failed to edit the record. Please try again.");
         return;
       }
-      navigate(`/expenses/${expenseId}`);
+      navigate(`/expenses/${expenseId}`, { replace: true });
     } catch {
       setError("Oops, failed to edit the record. Please try again.");
     }

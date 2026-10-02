@@ -164,7 +164,7 @@ public class ExpensesController : ControllerBase
     {
         // Get UserId from JWT claim object
         string? userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-          
+
         // No UserId found
         if (!int.TryParse(userIdClaim, out int userId))
         {
@@ -213,4 +213,40 @@ public class ExpensesController : ControllerBase
         return NoContent();
 
     }
+
+    [HttpDelete("{expenseId:int}")]
+    public async Task<IActionResult> DeleteExpense(int expenseId)
+    {
+        // Get UserId from JWT claim object
+        string? userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // No UserId found
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized();
+        }
+
+        // No expense record found with the userId and expenseId
+        var existingExpense = await _context.Expenses
+        .FirstOrDefaultAsync(
+            expense => expense.UserId == userId &&
+            expense.ExpenseId == expenseId);
+
+        // No expense record found
+        if (existingExpense is null)
+        {
+            return NotFound();
+        }
+
+        // Remove the expense record object
+        _context.Expenses.Remove(existingExpense);
+
+        // Save changes
+        await _context.SaveChangesAsync();
+
+        // Return HTTP 204 No Content
+        return NoContent();
+
+    }
+    
 }

@@ -91,6 +91,38 @@ export default function ExpenseDetailsPage() {
     getExpense();
   }, [navigate, expenseId]);
 
+  const deleteExpense = async () => {
+    try {
+      // Call API
+      // DELETE request
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/expenses/${expenseId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
+
+      if (res.status === 401) {
+        navigate("/", { replace: true });
+        return;
+      }
+
+      if (res.status === 404) {
+        setError("No record found.");
+        return;
+      }
+
+      if (!res.ok) {
+        setError("Failed to delete the record. Please try again later.");
+        return;
+      }
+
+      navigate("/expenses", { replace: true });
+    } catch {
+      setError("Failed to delete the record. Please try again later.");
+    }
+  };
   return (
     <div className='expense-details'>
       <div className='expense-content'>
@@ -117,7 +149,9 @@ export default function ExpenseDetailsPage() {
               <Link to={`/expenses/${expenseId}/edit`} className='edit-button'>
                 Edit
               </Link>
-              <button className='delete-button'>Delete</button>
+              <button className='delete-button' onClick={deleteExpense}>
+                Delete
+              </button>
             </div>
           </>
         )}
