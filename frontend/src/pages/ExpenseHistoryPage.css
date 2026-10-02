@@ -6,24 +6,6 @@
 
 }
 
-.history-header {
-    display: flex;
-    padding: 1.5rem 1.25rem 1rem 1.25rem;
-    align-items: center;
-    align-self: stretch;
-    border-bottom: 1px solid #D1D5DB;
-    background: #FFF;
-}
-
-.history-header h1 {
-    margin: 0;
-    font-size: 1.25rem;
-    line-height: 2;
-    color: #111827;
-    font-weight: 700;
-
-}
-
 .history-content {
     display: flex;
     flex-direction: column;

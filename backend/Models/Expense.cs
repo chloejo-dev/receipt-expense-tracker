@@ -1,8 +1,8 @@
 namespace ExpenseTracker.Api.Models;
 
-public class Receipt
+public class Expense
 {
-    public int ReceiptId { get; set; }
+    public int ExpenseId { get; set; }
     public decimal TotalAmount { get; set; }
     public DateOnly Date { get; set; }
 

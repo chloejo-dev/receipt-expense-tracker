@@ -11,8 +11,8 @@ import "./ExpenseHistoryPage.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-type Receipt = {
-  receiptId: number;
+type Expense = {
+  expenseId: number;
   date: string;
   storeName: string;
   categoryLabel: string;
@@ -21,7 +21,7 @@ type Receipt = {
 
 const CategoryLabels = {
   Dining: {
-    icon: <Coffee />,
+    icon: <Utensils />,
     color: "#EF4444",
     backgroundColor: "#FEE2E2",
   },
@@ -48,20 +48,20 @@ const CategoryLabels = {
 };
 
 export default function ExpenseHistoryPage() {
-  const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getReceipts = async () => {
+    const getExpenses = async () => {
       setError("");
 
-      // Call API to get the user's receipts
+      // Call API to get the user's expenses
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/api/receipts`,
+          `${import.meta.env.VITE_BASE_URL}/api/expenses`,
           {
             // Tell the browser to include cookie (credentials)
             credentials: "include",
@@ -84,7 +84,7 @@ export default function ExpenseHistoryPage() {
         }
 
         const data = await res.json();
-        setReceipts(data);
+        setExpenses(data);
         setIsLoading(false);
       } catch {
         setError("Failed to retrieve expense history. Please try again later.");
@@ -92,35 +92,38 @@ export default function ExpenseHistoryPage() {
       }
     };
 
-    getReceipts();
+    getExpenses();
   }, [navigate]);
 
   // Group expenses by date
-  const receiptsByDate = Object.groupBy(receipts, (receipt) => receipt.date);
-  const receiptGroups = Object.entries(receiptsByDate); // [[key, value], [key, value], ...]
+  const expensesByDate = Object.groupBy(expenses, (expense) => expense.date);
+  const expenseGroups = Object.entries(expensesByDate); // [[key, value], [key, value], ...]
 
   return (
     <div className='history-page'>
       <div className='history-content'>
         {isLoading ? (
-          <p>Loading receipts...</p>
+          <p>Loading expenses...</p>
         ) : error ? (
           <p>{error}</p>
-        ) : receiptGroups.length === 0 ? (
+        ) : expenseGroups.length === 0 ? (
           <p>You have no expense history yet. Ready to add one?</p>
         ) : (
-          receiptGroups.map(([date, dailyReceipts]) => (
+          expenseGroups.map(([date, dailyExpenses]) => (
             <section className='receipt-group' key={date}>
               <h2 className='receipt-date'>{date}</h2>
-              {dailyReceipts?.map((receipt) => (
-                <Link to={`/receipts/${receipt.receiptId}`}>
-                  <article key={receipt.receiptId} className='receipt-card'>
+              {dailyExpenses?.map((expense) => (
+                <Link
+                  to={`/expenses/${expense.expenseId}`}
+                  key={expense.expenseId}
+                >
+                  <article className='receipt-card'>
                     <Coffee />
-                    <h3>{receipt.storeName}</h3>
+                    <h3>{expense.storeName}</h3>
                     <p className='receipt-total-amount'>
-                      ${receipt.totalAmount}
+                      ${expense.totalAmount}
                     </p>
-                    <p>{receipt.categoryLabel}</p>
+                    <p>{expense.categoryLabel}</p>
                   </article>
                 </Link>
               ))}

@@ -1,10 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
-import AddReceiptPage from "./pages/AddReceiptPage";
+import AddExpensePage from "./pages/AddExpensePage";
 import ExpenseHistoryPage from "./pages/ExpenseHistoryPage";
-import ReceiptDetailsPage from "./pages/ReceiptDetailsPage";
+import ExpenseDetailsPage from "./pages/ExpenseDetailsPage";
 import DashBoard from "./pages/Dashboard";
+import EditExpensePage from "./pages/EditExpensePage";
 import AppLayout from "./layouts/AppLayout";
 
 function App() {
@@ -13,9 +14,10 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path='/sign-up' element={<SignUpPage />} />
         <Route path='/' element={<SignInPage />} />
-        <Route path='/add-receipt' element={<AddReceiptPage />} />
-        <Route path='/receipts/:receiptId' element={<ReceiptDetailsPage />} />
-        <Route path='/expense-history' element={<ExpenseHistoryPage />} />
+        <Route path='/add-expense' element={<AddExpensePage />} />
+        <Route path='/expenses/:expenseId' element={<ExpenseDetailsPage />} />
+        <Route path='/expenses/:expenseId/edit' element={<EditExpensePage />} />
+        <Route path='/expenses' element={<ExpenseHistoryPage />} />
         <Route path='/dashboard' element={<DashBoard />} />
       </Route>
     </Routes>

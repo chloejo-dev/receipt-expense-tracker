@@ -1,8 +1,8 @@
 namespace ExpenseTracker.Api.DTOs;
 
-public class ReceiptListItemResponse
+public class ExpenseListItemResponse
 {
-    public int ReceiptId { get; set; }
+    public int ExpenseId { get; set; }
     public DateOnly Date { get; set; }
     public string CategoryName { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
