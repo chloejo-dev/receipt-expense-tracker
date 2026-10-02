@@ -13,12 +13,11 @@ import type {
 
 export default function AddExpensePage() {
   const today = new Date();
-
   const date = today.getDate().toString().padStart(2, "0");
   const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear().toString();
-
   const currentDate = `${year}-${month}-${date}`;
+
   const [storeList, setStoreList] = useState<StoreOption[]>([]);
   const [categoryList, setCategoryList] = useState<CategoryOption[]>([]);
   const [storeId, setStoreId] = useState(0);
@@ -190,6 +189,17 @@ export default function AddExpensePage() {
         }),
       });
 
+      if (res.status === 400) {
+        const message = await res.text();
+        setError(message);
+        return;
+      }
+
+      if (res.status === 401) {
+        navigate("/", { replace: true });
+        return;
+      }
+
       // Handle error responses
       if (!res.ok) {
         setError("Failed to save a record. Please try again.");
@@ -197,7 +207,7 @@ export default function AddExpensePage() {
       }
 
       idempotencyKeyRef.current = null;
-      navigate("/expenses");
+      navigate("/expenses", { replace: true });
 
       // Handle errors
     } catch {
