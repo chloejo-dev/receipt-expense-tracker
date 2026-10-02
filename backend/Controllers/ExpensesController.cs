@@ -151,7 +151,7 @@ public class ExpensesController : ControllerBase
         return Ok(expense);
     }
 
-    [HttpPut("{expenseId: int}")]
+    [HttpPut("{expenseId:int}")]
     public async Task<IActionResult> EditExpense(ExpenseRequest request, int expenseId)
     {
         // Get UserId from JWT claim object
