@@ -14,7 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Store> Stores { get; set; }
     public DbSet<Category> Categories { get; set; }
 
-    public DbSet<Receipt> Receipts { get; set; }
+    public DbSet<Expense> Expenses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -120,19 +120,19 @@ public class AppDbContext : DbContext
         new Store { StoreId = 16, StoreName = "Other", CategoryId = 8 }
         );
 
-        modelBuilder.Entity<Receipt>()
-            .Property(receipt => receipt.TotalAmount)
+        modelBuilder.Entity<Expense>()
+            .Property(expense => expense.TotalAmount)
             .HasPrecision(18, 2);
 
-        modelBuilder.Entity<Receipt>()
-            .Property(receipt => receipt.IdempotencyKey)
+        modelBuilder.Entity<Expense>()
+            .Property(expense => expense.IdempotencyKey)
             .HasMaxLength(64);
 
-        modelBuilder.Entity<Receipt>()
-           .HasIndex(receipt => new
+        modelBuilder.Entity<Expense>()
+           .HasIndex(expense => new
            {
-               receipt.UserId,
-               receipt.IdempotencyKey
+               expense.UserId,
+               expense.IdempotencyKey
            })
            .IsUnique();
 
@@ -142,10 +142,10 @@ public class AppDbContext : DbContext
         .HasForeignKey(store => store.CategoryId)
         .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Receipt>()
-        .HasOne(receipt => receipt.Category)
+        modelBuilder.Entity<Expense>()
+        .HasOne(expense => expense.Category)
         .WithMany()
-        .HasForeignKey(receipt => receipt.CategoryId)
+        .HasForeignKey(expense => expense.CategoryId)
         .OnDelete(DeleteBehavior.NoAction);
 
     }

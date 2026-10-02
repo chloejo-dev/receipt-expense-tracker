@@ -1,7 +1,7 @@
 namespace ExpenseTracker.Api.DTOs;
 using System.ComponentModel.DataAnnotations;
 
-public class ReceiptRequest
+public class ExpenseRequest
 {
     [Range(typeof(decimal), "0.01", "999999.99")]
     public decimal TotalAmount { get; set; }

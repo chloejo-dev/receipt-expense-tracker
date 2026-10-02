@@ -1,4 +1,4 @@
-import "./ReceiptDetailsPage.css";
+import "./ExpenseDetailsPage.css";
 import {
   Coffee,
   Bus,
@@ -7,10 +7,10 @@ import {
   ShoppingCart,
   Clapperboard,
 } from "lucide-react";
-import { use, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
-type Receipt = {
+type Expense = {
   storeName: string;
   totalAmount: number;
   date: string;
@@ -40,23 +40,23 @@ const categoryStyles = {
   // },
 };
 
-export default function ReceiptDetailsPage() {
-  const { receiptId } = useParams();
-  const [receipt, setReceipt] = useState<Receipt>();
+export default function ExpenseDetailsPage() {
+  const { expenseId } = useParams();
+  const [expense, setExpense] = useState<Expense>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getReceipt = async () => {
+    const getExpense = async () => {
       setIsLoading(true);
       setError("");
 
       try {
-        // Call API to retrieve one receipt
+        // Call API to retrieve one expense
         const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/api/receipts/${receiptId}`,
+          `${import.meta.env.VITE_BASE_URL}/api/expenses/${expenseId}`,
           { credentials: "include" },
         );
 
@@ -66,14 +66,14 @@ export default function ReceiptDetailsPage() {
         }
 
         if (res.status === 404) {
-          setError("No record found");
+          setError("No record found.");
           setIsLoading(false);
           return;
         }
 
         if (!res.ok) {
           setError(
-            "Failed to retrieve receipt details. Please try again later.",
+            "Failed to retrieve expense details. Please try again later.",
           );
           setIsLoading(false);
           return;
@@ -81,41 +81,43 @@ export default function ReceiptDetailsPage() {
 
         const data = await res.json();
         console.log(data);
-        setReceipt(data);
+        setExpense(data);
         setIsLoading(false);
       } catch {
-        setError("Failed to retrieve receipt details. Please try again later.");
+        setError("Failed to retrieve expense details. Please try again later.");
         setIsLoading(false);
       }
     };
 
-    getReceipt();
-  }, [navigate, receiptId]);
+    getExpense();
+  }, [navigate, expenseId]);
 
   return (
     <div className='expense-details'>
       <div className='expense-content'>
         {isLoading ? (
-          <p>Loading receipt...</p>
+          <p>Loading expense...</p>
         ) : error ? (
           <p>{error}</p>
         ) : (
           <>
             <div className='expense-hero'>
               <div className='store-row'>
-                <h1>{receipt?.storeName}</h1>
-                <span>{receipt?.date}</span>
+                <h1>{expense?.storeName}</h1>
+                <span>{expense?.date}</span>
               </div>
               <div className='amount-block'>
                 <span>Total Amount</span>
                 <strong className='total-amount'>
-                  ${receipt?.totalAmount}
+                  ${expense?.totalAmount}
                 </strong>
               </div>
             </div>
-            <div className='category-block'>{receipt?.categoryName}</div>
+            <div className='category-block'>{expense?.categoryName}</div>
             <div className='expense-actions'>
-              <button className='edit-button'>Edit</button>
+              <Link to={`/expenses/${expenseId}/edit`} className='edit-button'>
+                Edit
+              </Link>
               <button className='delete-button'>Delete</button>
             </div>
           </>

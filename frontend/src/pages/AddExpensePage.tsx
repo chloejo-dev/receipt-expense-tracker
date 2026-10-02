@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import "./AddReceiptPage.css";
+import "./AddExpensePage.css";
 import { Camera } from "lucide-react";
 import getDefaultCategoryId from "./categorySelection";
+import { Link, useNavigate } from "react-router-dom";
 
 // Define types in a separate types file and import it to use
 import type {
@@ -10,11 +11,7 @@ import type {
   ExpenseOptionsResponse,
 } from "./expenseOptions.types";
 
-// interface ExpenseInput {
-//   categoryId: number;
-//   amount: number;
-// }
-export default function AddReceiptPage() {
+export default function AddExpensePage() {
   const today = new Date();
 
   const date = today.getDate().toString().padStart(2, "0");
@@ -35,6 +32,7 @@ export default function AddReceiptPage() {
   const [inputError, setInputError] = useState({ type: "", message: "" });
   const [isLoading, setIsLoading] = useState(true);
   const idempotencyKeyRef = useRef<string | null>(null);
+  const navigate = useNavigate();
 
   // Get expense options from DB
   useEffect(() => {
@@ -171,13 +169,13 @@ export default function AddReceiptPage() {
 
     setError("");
 
-    // Create an idempotencyKey to prevent duplicate receipt entries
+    // Create an idempotencyKey to prevent duplicate expense entries when the same request is retried multiple times
     const key = idempotencyKeyRef.current ?? crypto.randomUUID();
     idempotencyKeyRef.current = key;
 
-    // POST api/receipts
+    // POST api/expenses
     try {
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/receipts`, {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/expenses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -198,10 +196,8 @@ export default function AddReceiptPage() {
         return;
       }
 
-      const data = await res.json();
-
       idempotencyKeyRef.current = null;
-      console.log("Data successfully stored!", data);
+      navigate("/expense-history");
 
       // Handle errors
     } catch {
@@ -273,6 +269,7 @@ export default function AddReceiptPage() {
           step='0.01'
           min='0.01'
           max='999999.99'
+          placeholder='0.0'
           value={totalAmount}
           onChange={(e) => {
             resetIdempotencyKey();
@@ -358,9 +355,14 @@ export default function AddReceiptPage() {
         {inputError.type === "category" && <span>{inputError.message}</span>}
       </div>
       {error && <span>{error}</span>}
-      <button type='submit' className='save-btn'>
-        Save
-      </button>
+      <div className='actions'>
+        <button type='submit' className='save-btn'>
+          Save
+        </button>
+        <Link to='/dashboard' className='discard-btn'>
+          Discard
+        </Link>
+      </div>
     </form>
   );
 }

@@ -8,23 +8,15 @@ import type {
   ExpenseOptionsResponse,
 } from "./expenseOptions.types";
 
-type Expense = {
-  amount: number;
-  categoryId: number;
-  categoryName: string;
-  expenseId: number;
-};
-
-export default function EditReceiptPage() {
-  const { receiptId } = useParams();
+export default function EditExpensePage() {
+  const { expenseId } = useParams();
   // Get all stores and categories from the server
   const [storeList, setStoreList] = useState<StoreOption[]>([]);
   const [categoryList, setCategoryList] = useState<CategoryOption[]>([]);
   const [date, setDate] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
   const [storeId, setStoreId] = useState(0);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-
+  const [categoryId, setCategoryId] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [inputError, setInputError] = useState({ type: "", message: "" });
 
@@ -61,14 +53,14 @@ export default function EditReceiptPage() {
   }, []);
 
   useEffect(() => {
-    const getReceipt = async () => {
+    const getExpense = async () => {
       setIsLoading(true);
       setError("");
 
       try {
-        // Call API to retrieve one receipt
+        // Call API to retrieve one expense
         const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/api/receipts/${receiptId}`,
+          `${import.meta.env.VITE_BASE_URL}/api/expenses/${expenseId}`,
           { credentials: "include" },
         );
 
@@ -85,32 +77,32 @@ export default function EditReceiptPage() {
 
         if (!res.ok) {
           setError(
-            "Failed to retrieve receipt details. Please try again later.",
+            "Failed to retrieve expense details. Please try again later.",
           );
           setIsLoading(false);
           return;
         }
 
         const data = await res.json();
-
+        console.log(data);
         // Set and render the retrieved data
         setDate(data.date);
         setTotalAmount(String(data.totalAmount));
         setStoreId(data.storeId);
-        setExpenses(data.expenses);
+        // setCategoryId(data.expenses);
         setIsLoading(false);
       } catch {
-        setError("Failed to retrieve receipt details. Please try again later.");
+        setError("Failed to retrieve expense details. Please try again later.");
         setIsLoading(false);
       }
     };
 
-    getReceipt();
-  }, [navigate, receiptId]);
+    getExpense();
+  }, [navigate, expenseId]);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p role='alert'>{error}</p>;
-  if (!expenses) return <p>No receipt data found.</p>;
+  if (!categoryId) return <p>No expense data found.</p>;
 
   const handleSubmit: React.SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -145,7 +137,7 @@ export default function EditReceiptPage() {
     }
 
     // To-do: Replace this with categoryId
-    if (!expenses) {
+    if (!categoryId) {
       setInputError({
         type: "category",
         message: "Please select a category.",
@@ -159,7 +151,7 @@ export default function EditReceiptPage() {
       // Call API
       // PATCH request
       const res = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/api/receipts/${receiptId}`,
+        `${import.meta.env.VITE_BASE_URL}/api/expenses/${expenseId}`,
         {
           method: "PATCH",
           headers: {
@@ -170,7 +162,7 @@ export default function EditReceiptPage() {
             Date: date,
             totalAmount: parsedTotalAmount,
             StoreId: storeId,
-            Expenses: expenses,
+            Expenses: categoryId,
           }),
         },
       );
@@ -239,7 +231,7 @@ export default function EditReceiptPage() {
         </select>
       </div>
       <div className='expense-form-field'>
-        {expenses.map((expense) => (
+        {categoryId.map((expense) => (
           <div key={expense.expenseId}>
             <label htmlFor={`category-${expense.expenseId}`}>Category</label>
             <select
