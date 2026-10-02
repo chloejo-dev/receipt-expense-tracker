@@ -197,7 +197,7 @@ export default function AddExpensePage() {
       }
 
       idempotencyKeyRef.current = null;
-      navigate("/expense-history");
+      navigate("/expenses");
 
       // Handle errors
     } catch {
