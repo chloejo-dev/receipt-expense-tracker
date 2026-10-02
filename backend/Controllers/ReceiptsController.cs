@@ -62,37 +62,6 @@ public class ReceiptsController : ControllerBase
             return BadRequest("The selected store does not exist.");
         }
 
-        // Get unique category IDs from the request
-        List<int> uniqueCategoryIds = request.Expenses
-        .Select(expense => expense.CategoryId) // Select only CategoryId from each row
-        .Distinct() // Get rid of duplicate CategoryIds
-        .ToList(); // Create a new list of CategoryIds
-
-        // Make sure no duplicate categories are in the request
-        if (uniqueCategoryIds.Count < request.Expenses.Count)
-        {
-            return BadRequest("Duplicate categories are not allowed.");
-        }
-
-        // Check if all requested categories are in the Categories table
-        int existingCategoryCount = await _context.Categories
-        .CountAsync(category => uniqueCategoryIds.Contains(category.CategoryId));
-
-        // Make sure all requested categories exist
-        if (existingCategoryCount != uniqueCategoryIds.Count)
-        {
-            return BadRequest("One or more categories do not exist.");
-        }
-
-        // Calculate the sum of all requested expense amounts
-        decimal expenseTotal = request.Expenses.Sum(expense => expense.Amount);
-
-        // Total amount = sum of expenses?
-        if (expenseTotal != request.TotalAmount)
-        {
-            return BadRequest("The receipt total must equal the sum of expense amounts.");
-        }
-
 
         // Map DTO objects to DB entities
         Receipt receipt = new()
@@ -102,16 +71,10 @@ public class ReceiptsController : ControllerBase
             TotalAmount = request.TotalAmount,
             IdempotencyKey = idempotencyKey,
             StoreId = request.StoreId,
-            Expenses = request.Expenses
-            .Select(expense => new Expense
-            {
-                Amount = expense.Amount,
-                CategoryId = expense.CategoryId
-            })
-            .ToList()
+            CategoryId = request.CategoryId
         };
 
-        // Add the Receipt entity and its related expenses to DbContext
+        // Add the Receipt entity
         _context.Receipts.Add(receipt);
 
         // Save changes
@@ -143,12 +106,7 @@ public class ReceiptsController : ControllerBase
             // Map the records to response DTOs
             ReceiptId = receipt.ReceiptId,
             Date = receipt.Date,
-            // Display one category name or "Multiple Categories"
-            CategoryLabel = receipt.Expenses.Count > 1
-                ? "Multiple Categories"
-                : receipt.Expenses
-                    .Select(expense => expense.Category.CategoryName)
-                    .First(),
+            CategoryName = receipt.Category.CategoryName,
             TotalAmount = receipt.TotalAmount,
             StoreName = receipt.Store.StoreName
         }
@@ -179,15 +137,7 @@ public class ReceiptsController : ControllerBase
             StoreName = receipt.Store.StoreName,
             TotalAmount = receipt.TotalAmount,
             Date = receipt.Date,
-            // Get expenses from the Expenses table
-            Expenses = receipt.Expenses
-            .Select(expense => new ExpenseResponse
-            {
-                Amount = expense.Amount,
-                CategoryName = expense.Category.CategoryName,
-                ExpenseId = expense.ExpenseId
-            })
-            .ToList()
+            CategoryName = receipt.Category.CategoryName
         })
         .FirstOrDefaultAsync();
 

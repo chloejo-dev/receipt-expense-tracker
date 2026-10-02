@@ -10,17 +10,11 @@ import {
 import { use, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-type Expense = {
-  amount: number;
-  categoryName: string;
-  expenseId: number;
-};
-
 type Receipt = {
   storeName: string;
   totalAmount: number;
   date: string;
-  expenses: Expense[];
+  categoryName: string;
 };
 
 const categoryStyles = {
@@ -119,31 +113,7 @@ export default function ReceiptDetailsPage() {
                 </strong>
               </div>
             </div>
-            <div className='expense-breakdown'>
-              <div className='breakdown-header'>
-                <h2>Breakdown</h2>
-                <span>Category totals</span>
-              </div>
-              <div className='category-group'>
-                {receipt?.expenses.map((expense) => (
-                  <div key={expense.expenseId} className='category-card'>
-                    <div
-                      className='category-icon'
-                      style={{
-                        color: "#EF4444",
-                        backgroundColor: "#FEE2E2",
-                      }}
-                    >
-                      <Utensils />
-                    </div>
-                    <div className='category-details'>
-                      <h3 className='category'>{expense.categoryName}</h3>
-                      <p>${expense.amount}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <div className='category-block'>{receipt?.categoryName}</div>
             <div className='expense-actions'>
               <button className='edit-button'>Edit</button>
               <button className='delete-button'>Delete</button>
