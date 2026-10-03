@@ -82,7 +82,7 @@ export default function SignInForm() {
       }
 
       // Sign-in success
-      navigate("/dashboard");
+      navigate("/expenses");
     } catch {
       setSignInError("Something went wrong. Please try again.");
     }
