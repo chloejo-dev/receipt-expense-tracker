@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
 @import "tailwindcss";
 
 @layer base {
@@ -10,8 +11,38 @@
   }
 
   body {
-    font-family: "Libre Caslon Condensed", serif;
     font-optical-sizing: auto;
     font-style: normal;
   }
 }
+
+@theme {
+  --font-heading: "Sansation", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --color-primary: #071E2C;
+  --color-accent: #D3EAF8;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+  }
+}
+
+/* Dark green color scheme*/
+/* --color-primary: #006494; */
+/* --color-primary: #468DF8; #042C6C; #021636*/
+
+/* Blue color scheme */
+/* --color-shadow: #071E2C;
+  --color-midtone: #2196DE;
+  --color-highlight: #D3EAF8; */
+
+/* Dark Navy  */
+/* --color-primary: #0A5576;
+        --color-secondary: #468FEA;
+        --color-accent: #64CE92; */
+/* Dark green color scheme*/
+/* --color-primary: #184E2F;
+--color-secondary: #B1E7C8;
+--color-accent: #64CE92; */

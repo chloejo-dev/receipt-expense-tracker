@@ -1,4 +1,3 @@
-import "./ExpenseDetailsPage.css";
 import {
   Coffee,
   Bus,
@@ -80,6 +79,7 @@ export default function ExpenseDetailsPage() {
         }
 
         const data = await res.json();
+        console.log(data);
         setExpense(data);
         setIsLoading(false);
       } catch {
@@ -124,37 +124,45 @@ export default function ExpenseDetailsPage() {
     }
   };
   return (
-    <div className='expense-details'>
-      <div className='expense-content'>
+    <div className='flex flex-col gap-5 justify-center '>
+      <div className='flex flex-col items-center justify-center p-5 pb-10 text-primary rounded-xl shadow-lg bg-[#F5EFD6] '>
         {isLoading ? (
           <p>Loading expense...</p>
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <>
-            <div className='expense-hero'>
-              <div className='store-row'>
-                <h1>{expense?.storeName}</h1>
-                <span>{expense?.date}</span>
-              </div>
-              <div className='amount-block'>
-                <span>Total Amount</span>
-                <strong className='total-amount'>
-                  ${expense?.totalAmount}
-                </strong>
-              </div>
+          <article className='flex self-stretch gap-10'>
+            <div className='flex flex-col gap-1.5 flex-1'>
+              <p className='text-primary/60 font-heading text-xs rounded-full bg-primary/8 self-start px-3 py-1.5'>
+                {expense?.date}
+              </p>
+              <h1 className='font-semibold text-2xl font-heading'>
+                {expense?.storeName}
+              </h1>
+              <strong className='total-amount'>${expense?.totalAmount}</strong>
             </div>
-            <div className='category-block'>{expense?.categoryName}</div>
-            <div className='expense-actions'>
-              <Link to={`/expenses/${expenseId}/edit`} className='edit-button'>
-                Edit
-              </Link>
-              <button className='delete-button' onClick={deleteExpense}>
-                Delete
-              </button>
+            <div className='flex flex-col justify-center items-center'>
+              <div className='flex flex-col justify-center items-center w-12 h-12'>
+                <ShoppingCart size={30} />
+              </div>
+              <p className='text-xs'>{expense?.categoryName}</p>
             </div>
-          </>
+          </article>
         )}
+      </div>
+      <div className='flex gap-4 font-heading justify-center'>
+        <Link
+          to={`/expenses/${expenseId}/edit`}
+          className='flex bg-primary text-md text-semibold text-white rounded-2xl h-12 w-24 items-center justify-center'
+        >
+          Edit
+        </Link>
+        <button
+          className='flex  text-primary text-md rounded-2xl border-2  h-12 w-24 items-center justify-center'
+          onClick={deleteExpense}
+        >
+          Delete
+        </button>
       </div>
     </div>
   );

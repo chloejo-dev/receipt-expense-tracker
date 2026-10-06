@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import "./AddExpensePage.css";
 import { Camera } from "lucide-react";
 import getDefaultCategoryId from "./categorySelection";
 import { Link, useNavigate } from "react-router-dom";
@@ -221,155 +220,181 @@ export default function AddExpensePage() {
   };
 
   return (
-    <form className='expense-form' onSubmit={handleSubmit} noValidate>
-      <div className='expense-form-field'>
-        <label htmlFor='date'>Date</label>
-        <input
-          type='date'
-          id='date'
-          name='date'
-          required
-          value={expenseDate}
-          onChange={(e) => {
-            resetIdempotencyKey();
+    <form
+      className='flex flex-col gap-5 text-primary'
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      <div className='flex flex-col gap-1'>
+        <div className='flex flex-col'>
+          <label htmlFor='date' className='font-heading'>
+            Date
+          </label>
+          <input
+            className='p-2.5 border border-gray-300 bg-white outline-none rounded-xl focus:ring-1 focus:ring-secondary'
+            type='date'
+            id='date'
+            name='date'
+            required
+            value={expenseDate}
+            onChange={(e) => {
+              resetIdempotencyKey();
 
-            if (inputError.type === "date") {
-              setInputError({ type: "", message: "" });
-            }
-            setExpenseDate(e.target.value);
-          }}
-        />
-        {inputError.type === "date" && <span>{inputError.message}</span>}
-      </div>
-      <div className='expense-form-field'>
-        <label className='receipt-photo' htmlFor='receipt'>
-          <Camera />
-          {receiptFile ? receiptFile.name : "Take or upload a receipt"}
-        </label>
-        <input
-          type='file'
-          id='receipt'
-          name='receipt'
-          required
-          accept='image/*'
-          capture='environment'
-          className='receipt-input'
-          onChange={(e) => {
-            resetIdempotencyKey();
+              if (inputError.type === "date") {
+                setInputError({ type: "", message: "" });
+              }
+              setExpenseDate(e.target.value);
+            }}
+          />
+          {inputError.type === "date" && <span>{inputError.message}</span>}
+        </div>
+        <div className='flex flex-col'>
+          <label
+            htmlFor='receipt'
+            className='flex flex-col p-10 pb-2 border border-gray-300 rounded-xl bg-white justify-center items-center cursor-pointer '
+          >
+            <Camera />
+            {receiptFile ? receiptFile.name : "Take or upload a receipt"}
+          </label>
+          <input
+            className='hidden'
+            type='file'
+            id='receipt'
+            name='receipt'
+            required
+            accept='image/*'
+            capture='environment'
+            onChange={(e) => {
+              resetIdempotencyKey();
 
-            if (inputError.type === "receipt") {
-              setInputError({ type: "", message: "" });
-            }
-            // Get receipt photo
-            const file = e.target.files?.[0];
-            if (!file) return;
-            setReceiptFile(file);
-          }}
-        />
-        {extractionError && <span>{extractionError}</span>}
-        {inputError.type === "receipt" && <span>{inputError.message}</span>}
-      </div>
-      <div className='expense-form-field'>
-        <label htmlFor='total'>Total Amount ($)</label>
-        <input
-          type='number'
-          id='total'
-          name='total'
-          required
-          step='0.01'
-          min='0.01'
-          max='999999.99'
-          placeholder='0.0'
-          value={totalAmount}
-          onChange={(e) => {
-            resetIdempotencyKey();
+              if (inputError.type === "receipt") {
+                setInputError({ type: "", message: "" });
+              }
+              // Get receipt photo
+              const file = e.target.files?.[0];
+              if (!file) return;
+              setReceiptFile(file);
+            }}
+          />
+          {extractionError && <span>{extractionError}</span>}
+          {inputError.type === "receipt" && <span>{inputError.message}</span>}
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='total' className='font-heading'>
+            Total Amount
+          </label>
+          <input
+            className='p-2.5 border border-gray-300  rounded-xl bg-white outline-none  focus:ring-1 focus:ring-secondary'
+            type='number'
+            id='total'
+            name='total'
+            required
+            step='0.01'
+            min='0.01'
+            max='999999.99'
+            placeholder='$0.0'
+            value={totalAmount}
+            onChange={(e) => {
+              resetIdempotencyKey();
 
-            if (inputError.type === "total amount") {
-              setInputError({ type: "", message: "" });
-            }
-            setExtractionError("");
-            setNotification("");
-            setTotalAmount(e.target.value);
-          }}
-        />
-        {notification && <span>{notification}</span>}
-        {inputError.type === "total amount" && (
-          <span>{inputError.message}</span>
-        )}
-      </div>
-      <div className='expense-form-field'>
-        <label htmlFor='store'>Store</label>
-        <select
-          name='store'
-          id='store'
-          className='expense-form-select'
-          value={storeId}
-          onChange={(e) => {
-            resetIdempotencyKey();
+              if (inputError.type === "total amount") {
+                setInputError({ type: "", message: "" });
+              }
+              setExtractionError("");
+              setNotification("");
+              setTotalAmount(e.target.value);
+            }}
+          />
+          {notification && <span>{notification}</span>}
+          {inputError.type === "total amount" && (
+            <span>{inputError.message}</span>
+          )}
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='store' className='font-heading'>
+            Store
+          </label>
+          <select
+            className='p-2.5 border border-gray-300 rounded-xl bg-white outline-none  focus:ring-1 focus:ring-secondary'
+            name='store'
+            id='store'
+            value={storeId}
+            onChange={(e) => {
+              resetIdempotencyKey();
 
-            if (inputError.type === "store" || inputError.type === "category") {
-              setInputError({ type: "", message: "" });
-            }
-            // Get store id for the selected store
-            const selectedStoreId = Number(e.target.value);
-            setStoreId(selectedStoreId);
+              if (
+                inputError.type === "store" ||
+                inputError.type === "category"
+              ) {
+                setInputError({ type: "", message: "" });
+              }
+              // Get store id for the selected store
+              const selectedStoreId = Number(e.target.value);
+              setStoreId(selectedStoreId);
 
-            // Find defaultCategoryId
-            const defaultCategoryId = getDefaultCategoryId(
-              selectedStoreId,
-              storeList,
-            );
+              // Find defaultCategoryId
+              const defaultCategoryId = getDefaultCategoryId(
+                selectedStoreId,
+                storeList,
+              );
 
-            setCategoryId(defaultCategoryId);
-          }}
-          disabled={isLoading || storeList.length === 0}
-        >
-          <option value={0} disabled>
-            Select store
-          </option>
-          {storeList.map((store) => (
-            <option value={store.storeId} key={store.storeId}>
-              {store.storeName}
+              setCategoryId(defaultCategoryId);
+            }}
+            disabled={isLoading || storeList.length === 0}
+          >
+            <option value={0} disabled>
+              Select store
             </option>
-          ))}
-        </select>
-        {inputError.type === "store" && <span>{inputError.message}</span>}
-      </div>
-      <div className='expense-form-field'>
-        <label htmlFor='category'>Category</label>
-        <select
-          name='category'
-          id='category'
-          className='expense-form-select'
-          value={categoryId}
-          disabled={isLoading || categoryList.length === 0}
-          onChange={(e) => {
-            resetIdempotencyKey();
+            {storeList.map((store) => (
+              <option value={store.storeId} key={store.storeId}>
+                {store.storeName}
+              </option>
+            ))}
+          </select>
+          {inputError.type === "store" && <span>{inputError.message}</span>}
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='category'>Category</label>
+          <select
+            className='p-2.5 border border-gray-300 rounded-xl bg-white outline-none  focus:ring-1 focus:ring-secondary'
+            name='category'
+            id='category'
+            value={categoryId}
+            disabled={isLoading || categoryList.length === 0}
+            onChange={(e) => {
+              resetIdempotencyKey();
 
-            if (inputError.type === "category") {
-              setInputError({ type: "", message: "" });
-            }
-            const selectedCategoryId = Number(e.target.value);
-            setCategoryId(selectedCategoryId);
-          }}
-        >
-          <option value={0} disabled>
-            Select category
-          </option>
-          {categoryList.map((category) => (
-            <option value={category.categoryId} key={category.categoryId}>
-              {category.categoryName}
+              if (inputError.type === "category") {
+                setInputError({ type: "", message: "" });
+              }
+              const selectedCategoryId = Number(e.target.value);
+              setCategoryId(selectedCategoryId);
+            }}
+          >
+            <option value={0} disabled>
+              Select category
             </option>
-          ))}
-        </select>
-        {inputError.type === "category" && <span>{inputError.message}</span>}
+            {categoryList.map((category) => (
+              <option value={category.categoryId} key={category.categoryId}>
+                {category.categoryName}
+              </option>
+            ))}
+          </select>
+          {inputError.type === "category" && <span>{inputError.message}</span>}
+        </div>
+        {error && <span>{error}</span>}
       </div>
-      {error && <span>{error}</span>}
-      <div className='actions'>
-        <button type='submit' className='save-btn'>
+      <div className='flex gap-4 justify-center font-heading'>
+        <button
+          type='submit'
+          className='flex bg-primary text-md text-white rounded-xl h-12 w-24 items-center justify-center'
+        >
           Save
         </button>
-        <Link to='/dashboard' className='discard-btn'>
+        <Link
+          to='/dashboard'
+          className='flex  text-primary text-md rounded-xl border-2  h-12 w-24 items-center justify-center'
+        >
           Discard
         </Link>
       </div>

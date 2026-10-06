@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./SignInForm.css";
 import { useNavigate } from "react-router-dom";
 
 export default function SignInForm() {
@@ -89,43 +88,56 @@ export default function SignInForm() {
   };
 
   return (
-    <form className='sign-in-form' onSubmit={handleSubmit} noValidate>
-      <div className='form-field'>
-        <label htmlFor='email'>Email</label>
-        <input
-          type='email'
-          id='email'
-          name='email'
-          autoComplete='email'
-          onChange={(e) => {
-            setEmail(e.target.value);
-            if (inputError.field === "email") {
-              setInputError({ field: "", message: "" });
-            }
-          }}
-        />
-        {inputError.field === "email" && <span>{inputError.message}</span>}
+    <form
+      className='flex flex-col gap-5 text-primary'
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      <div className='flex flex-col gap-1'>
+        <div className='flex flex-col'>
+          <label htmlFor='email'>Email</label>
+          <input
+            className='p-2 border border-gray-300 rounded-xl focus:outline-none focus:border-primary'
+            type='email'
+            id='email'
+            name='email'
+            autoComplete='email'
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (inputError.field === "email") {
+                setInputError({ field: "", message: "" });
+              }
+            }}
+          />
+          {inputError.field === "email" && <span>{inputError.message}</span>}
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='password'>Password</label>
+          <input
+            className='p-2 border border-gray-300 rounded-xl focus:outline-none focus:border-primary'
+            type='password'
+            id='password'
+            name='password'
+            autoComplete='current-password'
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (inputError.field === "password") {
+                setInputError({ field: "", message: "" });
+              }
+            }}
+          />
+          {inputError.field === "password" && <span>{inputError.message}</span>}
+        </div>
       </div>
-      <div className='form-field'>
-        <label htmlFor='password'>Password</label>
-        <input
-          type='password'
-          id='password'
-          name='password'
-          autoComplete='current-password'
-          onChange={(e) => {
-            setPassword(e.target.value);
-            if (inputError.field === "password") {
-              setInputError({ field: "", message: "" });
-            }
-          }}
-        />
-        {inputError.field === "password" && <span>{inputError.message}</span>}
+      <div className='flex gap-4 justify-center font-heading'>
+        <button
+          type='submit'
+          className='bg-primary p-2.5 rounded-xl text-white cursor-pointer'
+        >
+          Sign in
+        </button>
+        {signInError && <span>{signInError}</span>}
       </div>
-      <button type='submit' className='sign-in-btn'>
-        Sign in
-      </button>
-      {signInError && <span>{signInError}</span>}
     </form>
   );
 }
