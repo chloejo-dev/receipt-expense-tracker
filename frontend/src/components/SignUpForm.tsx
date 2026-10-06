@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./SignUpForm.css";
 import { useNavigate } from "react-router-dom";
 import { CircleAlert } from "lucide-react";
 
@@ -124,145 +123,155 @@ export default function SignUpForm() {
   };
 
   return (
-    <form className='sign-up-form' onSubmit={handleSubmit} noValidate>
-      <div className='form-field'>
-        <label htmlFor='name'>Name</label>
-        <input
-          type='text'
-          id='name'
-          name='name'
-          value={name}
-          autoComplete='name'
-          onChange={(e) => {
-            setName(e.target.value);
+    <form className='flex flex-col gap-5' onSubmit={handleSubmit} noValidate>
+      <div className='flex flex-col gap-1'>
+        <div className='flex flex-col'>
+          <label htmlFor='name'>Name</label>
+          <input
+            className='p-2 border border-gray-300 rounded-xl focus:outline-none focus:border-primary'
+            type='text'
+            id='name'
+            name='name'
+            value={name}
+            autoComplete='name'
+            onChange={(e) => {
+              setName(e.target.value);
 
-            // Make sure to remove previous sign-up error
-            if (signUpError) {
-              setSignUpError("");
-            }
+              // Make sure to remove previous sign-up error
+              if (signUpError) {
+                setSignUpError("");
+              }
 
-            // Make sure to remove previous input error
-            if (inputError.field === "name") {
-              setInputError({
-                field: "",
-                message: "",
-              });
-            }
-          }}
-        />
-        {inputError.field === "name" && (
-          <span className='error-message'>
+              // Make sure to remove previous input error
+              if (inputError.field === "name") {
+                setInputError({
+                  field: "",
+                  message: "",
+                });
+              }
+            }}
+          />
+          {inputError.field === "name" && (
+            <span className='flex mt-1 gap-1 text-red-600'>
+              <CircleAlert size={20} />
+              {inputError.message}
+            </span>
+          )}
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='email'>Email</label>
+          <input
+            className='p-2 border border-gray-300 rounded-xl focus:outline-none focus:border-primary'
+            type='email'
+            id='email'
+            name='email'
+            value={email}
+            autoComplete='email'
+            onChange={(e) => {
+              setEmail(e.target.value);
+              // Make sure to remove previous sign-up error
+              if (signUpError) {
+                setSignUpError("");
+              }
+
+              // Make sure to remove previous input error
+              if (inputError.field === "email") {
+                setInputError({
+                  field: "",
+                  message: "",
+                });
+              }
+            }}
+          />
+          {inputError.field === "email" && (
+            <span className='flex mt-1 gap-1 text-red-600'>
+              <CircleAlert size={20} />
+              {inputError.message}
+            </span>
+          )}
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='password'>Password</label>
+          <input
+            className='p-2 border border-gray-300 rounded-xl focus:outline-none focus:border-primary'
+            type='password'
+            id='password'
+            name='password'
+            value={password}
+            autoComplete='new-password'
+            onChange={(e) => {
+              setPassword(e.target.value);
+
+              // Make sure to remove previous sign-up error
+              if (signUpError) {
+                setSignUpError("");
+              }
+
+              // Make sure to remove previous input error
+              if (inputError.field === "password") {
+                setInputError({
+                  field: "",
+                  message: "",
+                });
+              }
+            }}
+          />
+          {inputError.field === "password" && (
+            <span className='flex mt-1 gap-1 text-red-600'>
+              <CircleAlert size={20} />
+              {inputError.message}
+            </span>
+          )}
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='confirmPassword'>Confirm Password</label>
+          <input
+            className='p-2 border border-gray-300 rounded-xl focus:outline-none focus:border-primary'
+            type='password'
+            id='confirmPassword'
+            name='confirmPassword'
+            value={confirmPassword}
+            autoComplete='new-password'
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+
+              // Make sure to remove previous sign-up error
+              if (signUpError) {
+                setSignUpError("");
+              }
+
+              // Make sure to remove previous input error
+              if (inputError.field === "confirmPassword") {
+                setInputError({
+                  field: "",
+                  message: "",
+                });
+              }
+            }}
+          />
+
+          {inputError.field === "confirmPassword" && (
+            <span className='flex mt-1 gap-1 text-red-600'>
+              <CircleAlert size={20} />
+              {inputError.message}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className='flex gap-4 justify-center font-heading'>
+        <button
+          type='submit'
+          className='mt-8 bg-primary p-2 rounded-xl text-white cursor-pointer'
+        >
+          Sign up
+        </button>
+        {signUpError && (
+          <span className='flex mt-1 gap-1 text-red-600'>
             <CircleAlert size={20} />
-            {inputError.message}
+            {signUpError}
           </span>
         )}
       </div>
-      <div className='form-field'>
-        <label htmlFor='email'>Email</label>
-        <input
-          type='email'
-          id='email'
-          name='email'
-          value={email}
-          autoComplete='email'
-          onChange={(e) => {
-            setEmail(e.target.value);
-            // Make sure to remove previous sign-up error
-            if (signUpError) {
-              setSignUpError("");
-            }
-
-            // Make sure to remove previous input error
-            if (inputError.field === "email") {
-              setInputError({
-                field: "",
-                message: "",
-              });
-            }
-          }}
-        />
-        {inputError.field === "email" && (
-          <span className='error-message'>
-            <CircleAlert size={20} />
-            {inputError.message}
-          </span>
-        )}
-      </div>
-      <div className='form-field'>
-        <label htmlFor='password'>Password</label>
-        <input
-          type='password'
-          id='password'
-          name='password'
-          value={password}
-          autoComplete='new-password'
-          onChange={(e) => {
-            setPassword(e.target.value);
-
-            // Make sure to remove previous sign-up error
-            if (signUpError) {
-              setSignUpError("");
-            }
-
-            // Make sure to remove previous input error
-            if (inputError.field === "password") {
-              setInputError({
-                field: "",
-                message: "",
-              });
-            }
-          }}
-        />
-        {inputError.field === "password" && (
-          <span className='error-message'>
-            <CircleAlert size={20} />
-            {inputError.message}
-          </span>
-        )}
-      </div>
-      <div className='form-field'>
-        <label htmlFor='confirmPassword'>Confirm Password</label>
-        <input
-          type='password'
-          id='confirmPassword'
-          name='confirmPassword'
-          value={confirmPassword}
-          autoComplete='new-password'
-          onChange={(e) => {
-            setConfirmPassword(e.target.value);
-
-            // Make sure to remove previous sign-up error
-            if (signUpError) {
-              setSignUpError("");
-            }
-
-            // Make sure to remove previous input error
-            if (inputError.field === "confirmPassword") {
-              setInputError({
-                field: "",
-                message: "",
-              });
-            }
-          }}
-        />
-
-        {inputError.field === "confirmPassword" && (
-          <span className='error-message'>
-            <CircleAlert size={20} />
-            {inputError.message}
-          </span>
-        )}
-      </div>
-
-      <button type='submit' className='sign-up-btn'>
-        Sign up
-      </button>
-      {signUpError && (
-        <span className='error-message'>
-          <CircleAlert size={20} />
-          {signUpError}
-        </span>
-      )}
     </form>
   );
 }

@@ -1,13 +1,15 @@
 import {
-  Coffee,
   ShoppingCart,
-  Bus,
-  Film,
-  Hospital,
   Utensils,
+  BrushCleaning,
+  Shirt,
+  SmartphoneCharging,
+  Bus,
+  Hospital,
+  Film,
   Grid2X2,
+  ChevronRight,
 } from "lucide-react";
-import "./ExpenseHistoryPage.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -15,35 +17,55 @@ type Expense = {
   expenseId: number;
   date: string;
   storeName: string;
-  categoryLabel: string;
+  categoryName: string;
   totalAmount: number;
 };
 
 const CategoryLabels = {
+  Groceries: {
+    icon: <ShoppingCart />,
+    color: "#22C55E",
+    backgroundColor: "#DCFCE7",
+  },
   Dining: {
     icon: <Utensils />,
     color: "#EF4444",
     backgroundColor: "#FEE2E2",
   },
-  Groceries: {
-    icon: <ShoppingCart />,
-    color: "#22C55E",
-    backgroundColor: "#DCFCE7",
+  Household: {
+    icon: <BrushCleaning />,
+    color: "#EF4444",
+    backgroundColor: "#FEE2E2",
+  },
+  Clothing: {
+    icon: <Shirt />,
+    color: "#F57A99",
+    backgroundColor: "#FCDEE6",
+  },
+  Electronics: {
+    icon: <SmartphoneCharging />,
+    color: "#2163C4",
+    backgroundColor: "#DEFCFC",
   },
   Transportation: {
     icon: <Bus />,
     color: "#3B82F6",
     backgroundColor: "#DBEAFE",
   },
+  Health: {
+    icon: <Hospital />,
+    color: "#5BA022",
+    backgroundColor: "#B8F28A",
+  },
+  Other: {
+    icon: <Grid2X2 />,
+    color: "#8F9DAE",
+    backgroundColor: "#E0E5E2",
+  },
   Entertainment: {
     icon: <Film />,
     color: "#A855F7",
     backgroundColor: "#F3E8FF",
-  },
-  "Multiple Categories": {
-    icon: <Grid2X2 />,
-    color: "#F59E08",
-    backgroundColor: "#FEF3C7",
   },
 };
 
@@ -85,6 +107,7 @@ export default function ExpenseHistoryPage() {
 
         const data = await res.json();
         setExpenses(data);
+        console.log(data);
         setIsLoading(false);
       } catch {
         setError("Failed to retrieve expense history. Please try again later.");
@@ -100,8 +123,8 @@ export default function ExpenseHistoryPage() {
   const expenseGroups = Object.entries(expensesByDate); // [[key, value], [key, value], ...]
 
   return (
-    <div className='history-page'>
-      <div className='history-content'>
+    <div className='flex text-main'>
+      <div className='flex flex-col w-full gap-3'>
         {isLoading ? (
           <p>Loading expenses...</p>
         ) : error ? (
@@ -110,23 +133,27 @@ export default function ExpenseHistoryPage() {
           <p>You have no expense history yet. Ready to add one?</p>
         ) : (
           expenseGroups.map(([date, dailyExpenses]) => (
-            <section className='receipt-group' key={date}>
-              <h2 className='receipt-date'>{date}</h2>
-              {dailyExpenses?.map((expense) => (
-                <Link
-                  to={`/expenses/${expense.expenseId}`}
-                  key={expense.expenseId}
-                >
-                  <article className='receipt-card'>
-                    <Coffee />
-                    <h3>{expense.storeName}</h3>
-                    <p className='receipt-total-amount'>
-                      ${expense.totalAmount}
-                    </p>
-                    <p>{expense.categoryLabel}</p>
-                  </article>
-                </Link>
-              ))}
+            <section className='flex flex-col' key={date}>
+              <h2 className='text-md font-heading'>{date}</h2>
+              {dailyExpenses?.map((expense) => {
+                return (
+                  <Link
+                    to={`/expenses/${expense.expenseId}`}
+                    key={expense.expenseId}
+                  >
+                    <article className='flex items-center gap-1.5 m-1 pl-3 py-2 rounded-xl bg-white'>
+                      <div className='flex flex-col flex-1'>
+                        <h3 className='font-heading'>{expense.storeName}</h3>
+                        <p className='font-light text-gray-500 text-xs'>
+                          {expense.categoryName}
+                        </p>
+                      </div>
+                      <p className='font-semibold'>${expense.totalAmount}</p>
+                      <ChevronRight className='text-gray-400' strokeWidth={1} />
+                    </article>
+                  </Link>
+                );
+              })}
             </section>
           ))
         )}

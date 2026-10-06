@@ -191,81 +191,107 @@ export default function EditExpensePage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className='expense-form'>
-      <div className='expense-form-field'>
-        <label htmlFor='date'>Date</label>
-        <input
-          type='date'
-          id='date'
-          name='date'
-          required
-          value={date}
-          onChange={(e) => {
-            setDate(e.target.value);
-          }}
-        />
-      </div>
-      <div className='expense-form-field'>
-        <label htmlFor='total'>Total Amount ($)</label>
-        <input
-          type='number'
-          id='total'
-          name='total'
-          required
-          step='0.01'
-          min='0.01'
-          max='999999.99'
-          value={totalAmount}
-          onChange={(e) => {
-            setTotalAmount(e.target.value);
-          }}
-        />
-      </div>
-      <div className='expense-form-field'>
-        <label htmlFor='store'>Store</label>
-        <select
-          name='store'
-          id='store'
-          className='expense-form-select'
-          value={storeId}
-          onChange={(e) => {
-            setStoreId(Number(e.target.value));
-          }}
-        >
-          <option value={0} disabled>
-            Select store
-          </option>
-          {storeList.map((store) => (
-            <option value={store.storeId} key={store.storeId}>
-              {store.storeName}
+    <form
+      onSubmit={handleSubmit}
+      className='flex flex-col gap-5 bg-gray-100 text-main'
+    >
+      <div className='flex flex-col gap-3'>
+        <div className='flex flex-col'>
+          <label htmlFor='date' className='font-heading'>
+            Date
+          </label>
+          <input
+            className='p-2.5 border border-gray-300 bg-white outline-none  rounded-xl focus:ring-1 focus:ring-secondary'
+            type='date'
+            id='date'
+            name='date'
+            required
+            value={date}
+            onChange={(e) => {
+              setDate(e.target.value);
+            }}
+          />
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='total' className='font-heading'>
+            Total Amount ($)
+          </label>
+          <input
+            className='p-2.5 border border-gray-300  rounded-xl bg-white outline-none  focus:ring-1 focus:ring-secondary'
+            type='number'
+            id='total'
+            name='total'
+            required
+            step='0.01'
+            min='0.01'
+            max='999999.99'
+            value={totalAmount}
+            onChange={(e) => {
+              setTotalAmount(e.target.value);
+            }}
+          />
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='store' className='font-heading'>
+            Store
+          </label>
+          <select
+            className='p-2.5 border border-gray-300  rounded-xl bg-white outline-none  focus:ring-1 focus:ring-secondary'
+            name='store'
+            id='store'
+            value={storeId}
+            onChange={(e) => {
+              setStoreId(Number(e.target.value));
+            }}
+          >
+            <option value={0} disabled>
+              Select store
             </option>
-          ))}
-        </select>
-      </div>
-      <div className='expense-form-field'>
-        <label htmlFor='category'>Category</label>
-        <select
-          name='category'
-          id='category'
-          className='expense-form-select'
-          value={categoryId}
-          onChange={(e) => {
-            setCategoryId(Number(e.target.value));
-          }}
-        >
-          <option value={0} disabled>
-            Select Category
-          </option>
-          {categoryList.map((category) => (
-            <option value={category.categoryId} key={category.categoryId}>
-              {category.categoryName}
+            {storeList.map((store) => (
+              <option value={store.storeId} key={store.storeId}>
+                {store.storeName}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className='flex flex-col'>
+          <label htmlFor='category' className='font-heading'>
+            Category
+          </label>
+          <select
+            className='p-2.5 border border-gray-300  rounded-xl bg-white outline-none  focus:ring-1 focus:ring-secondary'
+            name='category'
+            id='category'
+            value={categoryId}
+            onChange={(e) => {
+              setCategoryId(Number(e.target.value));
+            }}
+          >
+            <option value={0} disabled>
+              Select Category
             </option>
-          ))}
-        </select>
+            {categoryList.map((category) => (
+              <option value={category.categoryId} key={category.categoryId}>
+                {category.categoryName}
+              </option>
+            ))}
+          </select>
+        </div>
+        {error && <span>{error}</span>}
       </div>
-      <div>
-        <button type='submit'>Save</button>
-        <Link to='/expenses'>Discard</Link>
+      <div className='flex gap-4 justify-center font-heading'>
+        <button
+          type='submit'
+          className='flex bg-primary rounded-2xl h-12 w-24 items-center justify-center text-md text-white'
+        >
+          Save
+        </button>
+        <Link
+          to='/expenses'
+          className='flex  text-primary text-md rounded-2xl border-2  h-12 w-24 items-center justify-center'
+        >
+          Discard
+        </Link>
       </div>
     </form>
   );
